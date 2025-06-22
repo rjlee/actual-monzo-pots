@@ -14,9 +14,9 @@ An application to sync Monzo Pot balances to Actual Budget accounts.
 
 1. Register a new OAuth client on the Monzo Developer Portal (https://developers.monzo.com/) to obtain Monzo credentials:
    - Give your client a Name (displayed during the authorization prompt).
-   - Set Redirect URL to `http://<your_host>/auth/callback`.
+   - Set Redirect URL to `http://localhost:3000/auth/callback` (_or_ `http://<your_host>:${HTTP_PORT}/auth/callback` if you override `HTTP_PORT`).
    - Set Confidentiality to "Confidential".
-     After submission, note the Client ID and Client Secret values, then set `REDIRECT_URI` to your callback URL (`http://<your_host>/auth/callback`).
+     After submission, note the Client ID and Client Secret values, then set `REDIRECT_URI` to your callback URL (e.g. `http://localhost:3000/auth/callback`).
 2. Copy `.env.example` to `.env` and fill in your Monzo credentials (CLIENT_ID, CLIENT_SECRET, REDIRECT_URI,
    MONZO_SCOPES) and your Actual Budget settings (ACTUAL_SERVER_URL, ACTUAL_PASSWORD, ACTUAL_BUDGET_ID).
 3. Copy `config.example.yaml` to `config.yaml` if you need to override defaults (schedule, HTTP_PORT, MAPPING_FILE).
