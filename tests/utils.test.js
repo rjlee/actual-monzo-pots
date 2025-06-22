@@ -20,11 +20,10 @@ describe('setupMonzo', () => {
     if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true, force: true });
   });
 
-  it('creates token directory and initializes Monzo client', async () => {
+  it('initializes Monzo client', async () => {
     process.env.TOKEN_DIRECTORY = testDir;
     monzo.init.mockResolvedValue();
     await setupMonzo();
-    expect(fs.existsSync(testDir)).toBe(true);
     expect(monzo.init).toHaveBeenCalled();
   });
 });
@@ -92,6 +91,30 @@ describe('openBudget', () => {
     await openBudget();
 
     expect(api.downloadBudget).toHaveBeenCalledWith('budget1', {});
+  });
+
+  it('cleans up old budget cache before download', async () => {
+    process.env.ACTUAL_SERVER_URL = 'http://example.com';
+    process.env.ACTUAL_PASSWORD = 'pw';
+    process.env.ACTUAL_BUDGET_ID = 'budget1';
+    process.env.BUDGET_CACHE_DIR = testDir;
+
+    // Prepopulate cache dir with stale files and a .gitkeep
+    fs.mkdirSync(testDir, { recursive: true });
+    fs.writeFileSync(path.join(testDir, 'old.txt'), 'foo');
+    fs.mkdirSync(path.join(testDir, 'nested'), { recursive: true });
+    fs.writeFileSync(path.join(testDir, 'nested', 'bar.txt'), 'bar');
+    fs.writeFileSync(path.join(testDir, '.gitkeep'), '');
+
+    api.init.mockResolvedValue();
+    api.runImport.mockImplementation(async (_name, fn) => {
+      await fn();
+    });
+    api.downloadBudget.mockResolvedValue();
+
+    await openBudget();
+    const remaining = fs.readdirSync(testDir).sort();
+    expect(remaining).toEqual(['.gitkeep']);
   });
 });
 

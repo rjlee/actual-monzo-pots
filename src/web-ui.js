@@ -160,7 +160,7 @@ function uiPageHtml() {
             statusEl.className = 'badge bg-info';
           }
         } catch (err) {
-          logger.error({ err }, 'Error polling budget-status');
+          console.error('Error polling budget-status', err);
           statusEl.textContent = 'Budget downloading';
           statusEl.className = 'badge bg-info';
         }

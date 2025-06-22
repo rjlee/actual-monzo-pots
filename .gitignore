@@ -12,7 +12,12 @@ monzo_cache/
 
 # Actual Budget cache directories (generated)
 budget/
-data/
+# Persisted application and cache data (ignored, but kept in repo via .gitkeep)
+data/*
+!data/.gitkeep
+!data/budget/
+data/budget/*
+!data/budget/.gitkeep
 
 # Custom resource files
 resources/

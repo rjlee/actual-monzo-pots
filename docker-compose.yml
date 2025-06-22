@@ -16,7 +16,7 @@ services:
         source: ./data
         target: /app/data
       - type: bind
-        source: ./budget
+        source: ./data/budget
         target: /app/budget
     logging:
       driver: json-file

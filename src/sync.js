@@ -98,9 +98,6 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
     }
 
     // Save updated mapping
-    // Ensure parent directory exists (e.g. data/) before writing mapping
-    const mapDir = path.dirname(mappingPath);
-    fs.mkdirSync(mapDir, { recursive: true });
     fs.writeFileSync(mappingPath, JSON.stringify(mapping, null, 2));
     log.info({ applied }, 'Completed pot sync');
   } catch (err) {

@@ -1,12 +1,11 @@
 require('dotenv').config();
 const fs = require('fs');
+const path = require('path');
 const api = require('@actual-app/api');
 const monzo = require('./monzo-client');
 const logger = require('./logger');
 
 async function setupMonzo() {
-  const dir = process.env.TOKEN_DIRECTORY;
-  if (dir && !fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
   logger.info('Initializing Monzo client...');
   await monzo.init();
 }
@@ -21,7 +20,20 @@ async function openBudget() {
     );
   }
   const dataDir = process.env.BUDGET_CACHE_DIR || './budget';
-  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+
+  // Clean up old budget cache entries, preserving .gitkeep
+  if (fs.existsSync(dataDir)) {
+    for (const entry of fs.readdirSync(dataDir)) {
+      if (entry === '.gitkeep') continue;
+      try {
+        fs.rmSync(path.join(dataDir, entry), { recursive: true, force: true });
+      } catch {
+        /* ignore cleanup errors */
+      }
+    }
+  } else {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
 
   logger.info('Connecting to Actual API...');
   await api.init({ dataDir, serverURL: url, password });
