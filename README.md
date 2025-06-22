@@ -18,7 +18,8 @@ An application to sync Monzo Pot balances to Actual Budget accounts.
    - Set Confidentiality to "Confidential".
      After submission, note the Client ID and Client Secret values, then set `REDIRECT_URI` to your callback URL (e.g. `http://localhost:3000/auth/callback`).
 2. Copy `.env.example` to `.env` and fill in your Monzo credentials (CLIENT_ID, CLIENT_SECRET, REDIRECT_URI,
-   MONZO_SCOPES) and your Actual Budget settings (ACTUAL_SERVER_URL, ACTUAL_PASSWORD, ACTUAL_BUDGET_ID).
+   MONZO_SCOPES) and your Actual Budget settings (ACTUAL_SERVER_URL, ACTUAL_PASSWORD, ACTUAL_BUDGET_ID,
+   ACTUAL_BUDGET_ENCRYPTION_PASSWORD if your budget file is encrypted).
 3. Copy `config.example.yaml` to `config.yaml` if you need to override defaults (schedule, HTTP_PORT, MAPPING_FILE).
 4. Build and run with Docker Compose:
 
@@ -26,11 +27,12 @@ An application to sync Monzo Pot balances to Actual Budget accounts.
    docker-compose up --build -d
    ```
 
-   _or_ run locally:
+_or_ run locally:
+
+_The `data/` and `data/budget/` directories are included in the repo (with `.gitkeep` to preserve them)._
 
 ```bash
 npm install
-mkdir -p data/monzo_cache data/budget
 npm run daemon -- --ui [--verbose]
 ```
 
