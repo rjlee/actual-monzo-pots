@@ -12,11 +12,13 @@ An application to sync Monzo Pot balances to Actual Budget accounts.
 
 ## Quick Start
 
-1. Register a new OAuth client on the Monzo Developer Portal (https://developers.monzo.com/) to obtain Monzo credentials.
-   See [resources/monzo-export README](resources/monzo-export/README.md#connecting-to-monzo) for detailed instructions on
-   setting up CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, and MONZO_AUTH_PATH (e.g. `/auth`).
+1. Register a new OAuth client on the Monzo Developer Portal (https://developers.monzo.com/) to obtain Monzo credentials:
+   - Give your client a Name (displayed during the authorization prompt).
+   - Set Redirect URL to `http://<your_host>/auth/callback`.
+   - Set Confidentiality to "Confidential".
+   After submission, note the Client ID and Client Secret values, then set `REDIRECT_URI` to your callback URL (`http://<your_host>/auth/callback`).
 2. Copy `.env.example` to `.env` and fill in your Monzo credentials (CLIENT_ID, CLIENT_SECRET, REDIRECT_URI,
-   MONZO_AUTH_PATH, MONZO_SCOPES) and your Actual Budget settings (ACTUAL_SERVER_URL, ACTUAL_PASSWORD, ACTUAL_BUDGET_ID).
+   MONZO_SCOPES) and your Actual Budget settings (ACTUAL_SERVER_URL, ACTUAL_PASSWORD, ACTUAL_BUDGET_ID).
 3. Copy `config.example.yaml` to `config.yaml` if you need to override defaults (schedule, HTTP_PORT, MAPPING_FILE).
 4. Build and run with Docker Compose:
 
@@ -35,7 +37,7 @@ npm run daemon -- --ui [--verbose]
 5. Open your browser to <http://localhost:3000> (or your configured HTTP_PORT), click **Authenticate Monzo** to
    complete OAuth, map pots to Actual accounts, and click **Sync Now**.
 
-> **Note:** To force a fresh Monzo OAuth token (e.g. after changing MONZO_SCOPES or MONZO_AUTH_PATH), delete
+> **Note:** To force a fresh Monzo OAuth token (e.g. after changing MONZO_SCOPES), delete
 > `data/monzo_refresh_token.txt`.
 
 ## Configuration
