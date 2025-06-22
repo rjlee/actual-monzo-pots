@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  pots-sync:
+    build: .
+    container_name: monzo-pots-sync
+    env_file:
+      - .env
+    ports:
+      - '${HTTP_PORT:-3000}:${HTTP_PORT:-3000}'
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+      - ./budget:/app/budget
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'

@@ -1,0 +1,28 @@
+# Dependency directories
+node_modules/
+
+# Log files
+*.log
+
+# Environment files
+.env
+
+# Monzo token cache directory
+monzo_cache/
+
+# Actual Budget cache directories (generated)
+budget/
+data/
+
+# Custom resource files
+resources/
+
+# Coverage directory
+# Coverage directory
+coverage/
+
+# Misc scripts to ignore
+deploy.sh
+
+# Misc
+.DS_Store

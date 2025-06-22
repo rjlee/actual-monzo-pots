@@ -1,0 +1,15 @@
+# Sample YAML configuration file.
+# Copy to config.yaml or config.yml in the project root and adjust settings as needed.
+
+# Sync schedule (once an hour on the hour)
+SYNC_CRON: '0 * * * *'
+SYNC_CRON_TIMEZONE: UTC
+
+# Disable cron scheduling (daemon mode only; default: false)
+DISABLE_CRON_SCHEDULING: false
+
+# Port for web UI server (daemon mode only)
+HTTP_PORT: 3000
+
+# Path to JSON file to store pot-account mappings
+MAPPING_FILE: './data/mapping.json'
