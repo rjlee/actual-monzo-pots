@@ -51,12 +51,12 @@ function uiPageHtml() {
         </tr></thead>
         <tbody id="mappingBody"></tbody>
       </table>
-      <div class="d-flex gap-2">
+      <div class="d-flex align-items-center gap-2">
         <button id="saveBtn" class="btn btn-primary">Save Mappings</button>
         <button id="syncBtn" class="btn btn-success">Sync Now</button>
+        <span id="status"></span>
       </div>
     </div>
-    <div id="status" class="mt-4 text-center"></div>
   </div>
   <script>
     // Display OAuth callback status

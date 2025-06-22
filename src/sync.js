@@ -71,7 +71,7 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
       // Fetch the current balance from Actual Budget to guard against stale mapping.json
       let last = 0;
       try {
-        last = await api.getAccountBalance({ id: acctId, cutoff: new Date() });
+        last = await api.getAccountBalance(acctId, new Date());
       } catch (err) {
         log.warn(
           { accountId: acctId, err },
@@ -88,7 +88,7 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
       // Import transaction to Actual Budget
       const tx = {
         id: `${pot.id}-${Date.now()}`,
-        date: new Date().toISOString(),
+        date: new Date(),
         amount: delta,
         payee: pot.name,
       };
