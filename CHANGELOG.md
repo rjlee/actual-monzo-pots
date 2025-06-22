@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.2.0...v1.3.0) (2025-06-22)
+
+
+### Features
+
+* implement Monzo authentication checks and enhance API data handling ([3525607](https://github.com/rjlee/actual-monzo-pots/commit/3525607dbb22825c1520a1d418e509e147a76a38))
+
 # [1.2.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.1.0...v1.2.0) (2025-06-22)
 
 
