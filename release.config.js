@@ -4,8 +4,6 @@
  */
 module.exports = {
   branches: ['main'],
-  // Automatically inferred from package.json.repository or git remote; can be overridden with REPOSITORY_URL
-  repositoryUrl: process.env.REPOSITORY_URL,
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
