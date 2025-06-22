@@ -39,18 +39,29 @@ npm run daemon -- --ui [--verbose]
 
 See `.env.example` and `config.example.yaml` for available options.
 
+## Releases & Docker
+
+We use GitHub Actions + semantic-release to automate version bumps, changelogs, GitHub releases, and Docker image publishing:
+
+- **CI & Release** (`.github/workflows/release.yml`) runs on push to `main`: lint, format-check, test, and `semantic-release` (updates `CHANGELOG.md` and `package.json`, tags a release, and merges to the `release` branch).
+- **Docker Build & Publish** (`.github/workflows/docker.yml`) runs on push to `release` (or after the CI workflow succeeds): builds the Docker image and publishes to GitHub Container Registry (`ghcr.io/<owner>/<repo>:<version>` and `:latest`).
+
+Ensure your repository has the `GITHUB_TOKEN` secret (automatically injected) so that Semantic Release and Docker publishing can push back to GitHub.
+
 ## GitHub Actions
 
 This project includes workflows for CI, release, and Docker publishing in `.github/workflows`.
 
 ## Development
 
-We use ESLint, Prettier, Husky, lint-staged, and Jest to enforce code quality.
+We use ESLint, Prettier, Husky (Git hooks), lint-staged, and Jest to enforce code quality.
 
-Install dependencies:
+Install dependencies and enable Git hooks:
 
 ```bash
 npm install
+# Husky installs hooks defined in package.json (pre-commit, pre-push)
+npm run prepare
 ```
 
 Lint and format checks:
