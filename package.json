@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Sync Monzo Pot balances to Actual Budget accounts",
   "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/actual-app/actual-monzo-pots.git"
+  },
   "scripts": {
     "start": "node src/index.js --mode sync",
     "sync": "node src/index.js --mode sync",

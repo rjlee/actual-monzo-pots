@@ -4,7 +4,8 @@
  */
 module.exports = {
   branches: ['main'],
-  repositoryUrl: process.env.REPOSITORY_URL || 'https://github.com/robl/actual-monzo-pots.git',
+  // Automatically inferred from package.json.repository or git remote; can be overridden with REPOSITORY_URL
+  repositoryUrl: process.env.REPOSITORY_URL,
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
