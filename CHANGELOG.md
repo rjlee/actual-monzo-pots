@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/rjlee/actual-monzo-pots/compare/v1.3.0...v1.3.1) (2025-06-22)
+
+
+### Bug Fixes
+
+* update API call parameters and enhance UI layout for better status display ([058ab9d](https://github.com/rjlee/actual-monzo-pots/commit/058ab9d1d0e96c25f13a5df9682ce7dec35fb1c0))
+
 # [1.3.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.2.0...v1.3.0) (2025-06-22)
 
 
