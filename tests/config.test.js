@@ -40,8 +40,8 @@ describe('loadConfig', () => {
   });
 
   it('throws error when YAML config is invalid', () => {
-  fs.writeFileSync(yamlPath, ':::not yaml:::');
-  // js-yaml may not throw on this input; ensure loadConfig returns parsed output or empty object
-  expect(configMod.loadConfig()).toEqual(yaml.load(':::not yaml:::'));
+    fs.writeFileSync(yamlPath, ':::not yaml:::');
+    // js-yaml may not throw on this input; ensure loadConfig returns parsed output or empty object
+    expect(configMod.loadConfig()).toEqual(yaml.load(':::not yaml:::'));
   });
 });
