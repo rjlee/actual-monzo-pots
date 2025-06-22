@@ -80,14 +80,19 @@ function uiPageHtml() {
      */
     async function loadData(ready = false) {
       // Attempt to fetch fresh data; if fetch fails, bail out
-      let res, json;
+      let res;
       try {
         res = await fetch('/api/data');
-        json = await res.json();
       } catch (err) {
-        logger.error({ err }, 'Failed to fetch /api/data');
+        console.error('Failed to fetch /api/data', err);
         return;
       }
+      if (res.status === 401) {
+        // Not authenticated; redirect to Monzo OAuth
+        window.location.href = '/auth';
+        return;
+      }
+      const json = await res.json();
       const { monoAccounts, pots, accounts, mapping: map, authenticated } = json;
       mapping = map;
       // Update Monzo authentication status badge
@@ -246,6 +251,10 @@ async function startWebUi(httpPort, verbose) {
   app.get('/', (_req, res) => res.send(uiPageHtml()));
 
   app.get('/api/data', async (_req, res) => {
+    // Require Monzo authentication to fetch data
+    if (!monzo.isAuthenticated()) {
+      return res.status(401).end();
+    }
     // Read existing mappings
     let mapping = [];
     try {
