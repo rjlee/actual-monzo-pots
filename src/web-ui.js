@@ -59,6 +59,13 @@ function uiPageHtml() {
     </div>
   </div>
   <script>
+    // Indicate prior Monzo authentication via stored refresh token
+    const initialHasRefreshToken = ${JSON.stringify(Boolean(monzo.refreshToken))};
+    if (initialHasRefreshToken) {
+      const authEl = document.getElementById('authStatus');
+      authEl.textContent = 'Monzo refreshing authentication';
+      authEl.className = 'badge bg-info';
+    }
     // Display OAuth callback status
     (function() {
       const params = new URLSearchParams(window.location.search);
