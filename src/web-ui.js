@@ -307,15 +307,15 @@ async function startWebUi(httpPort, verbose) {
     app.use(express.urlencoded({ extended: false }));
 
     const loginForm = (error) =>
-      `<!DOCTYPE html>
-<html><body>
-  <h1>Login</h1>
-  ${error ? `<p style="color:red">${error}</p>` : ''}
-  <form method="post" action="${LOGIN_PATH}">
-    <input type="password" name="password" placeholder="Password" autofocus />
-    <button>Log in</button>
-  </form>
-</body></html>`;
+      '<!DOCTYPE html><html><body>' +
+      '<h1>Login</h1>' +
+      (error ? '<p style="color:red">' + error + '</p>' : '') +
+      '<form method="post" action="' +
+      LOGIN_PATH +
+      '">' +
+      '<input type="password" name="password" placeholder="Password" autofocus />' +
+      '<button>Log in</button>' +
+      '</form></body></html>';
 
     app.post(LOGIN_PATH, (req, res) => {
       if (req.body.password === SECRET) {
