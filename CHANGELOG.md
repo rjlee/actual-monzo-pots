@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.12.0...v1.13.0) (2025-06-23)
+
+
+### Features
+
+* implement session-based authentication using cookie-session and update related tests ([90d7f12](https://github.com/rjlee/actual-monzo-pots/commit/90d7f126ad2036733ab77969895064786e129176))
+
 # [1.12.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.11.0...v1.12.0) (2025-06-23)
 
 
