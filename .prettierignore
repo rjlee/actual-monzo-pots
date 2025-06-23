@@ -4,3 +4,6 @@ mapping.json
 budget/
 coverage/
 CHANGELOG.md
+
+# Ignore EJS templates (server-side rendering)
+**/*.ejs

@@ -15,9 +15,16 @@ const { runSync } = require('./sync');
 const asyncHandler = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 // Generate the HTML for the UI page via EJS template
-function uiPageHtml(hadRefreshToken, refreshError) {
-  const template = fs.readFileSync(path.join(__dirname, 'views', 'index.ejs'), 'utf8');
-  return ejs.render(template, { hadRefreshToken, refreshError });
+// Generate the HTML for the UI page via EJS template
+// uiAuthEnabled toggles display of the logout button in the UI
+function uiPageHtml(hadRefreshToken, refreshError, uiAuthEnabled) {
+  const templatePath = path.join(__dirname, 'views', 'index.ejs');
+  const template = fs.readFileSync(templatePath, 'utf8');
+  return ejs.render(
+    template,
+    { hadRefreshToken, refreshError, uiAuthEnabled },
+    { filename: templatePath }
+  );
 }
 
 /**
@@ -62,6 +69,8 @@ async function startWebUi(httpPort, verbose) {
     });
   const app = express();
   app.use(express.json());
+  // Serve static assets (JS/CSS) from the public/ directory at project root
+  app.use(express.static(path.join(__dirname, '..', 'public')));
 
   // If configured, serve over HTTPS using provided SSL key & cert
   if (process.env.SSL_KEY && process.env.SSL_CERT) {
@@ -87,36 +96,11 @@ async function startWebUi(httpPort, verbose) {
     }
     app.use(express.urlencoded({ extended: false }));
 
-    const loginForm = (error) => `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>actual-monzo-pots Login</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-  <div class="container py-5">
-    <h1 class="mb-4 text-center">actual-monzo-pots</h1>
-    <div class="row justify-content-center">
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h2 class="card-title text-center mb-4">Login</h2>
-            ${error ? `<div class="alert alert-danger text-center">${error}</div>` : ''}
-            <form method="post" action="${LOGIN_PATH}">
-              <div class="mb-3">
-                <input type="password" name="password" class="form-control" placeholder="Password" autofocus />
-              </div>
-              <button type="submit" class="btn btn-primary w-100">Log in</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
+    const loginForm = (error) => {
+      const templatePath = path.join(__dirname, 'views', 'login.ejs');
+      const template = fs.readFileSync(templatePath, 'utf8');
+      return ejs.render(template, { error, LOGIN_PATH }, { filename: templatePath });
+    };
 
     app.post(LOGIN_PATH, (req, res) => {
       if (req.body.password === SECRET) {
@@ -126,6 +110,9 @@ async function startWebUi(httpPort, verbose) {
       return res.status(401).send(loginForm('Invalid password'));
     });
 
+    // Show login form on GET /login
+    app.get(LOGIN_PATH, (_req, res) => res.send(loginForm()));
+
     app.use((req, res, next) => {
       // Check for our session cookie
       const header = req.headers.cookie || '';
@@ -133,8 +120,14 @@ async function startWebUi(httpPort, verbose) {
       if (cookies.includes(`${COOKIE_NAME}=1`)) {
         return next();
       }
-      if (req.path === LOGIN_PATH) return next();
+      // All other unauthenticated requests show the login form
       return res.send(loginForm());
+    });
+
+    // Logout endpoint – clears session cookie and redirects to login page
+    app.post('/logout', (req, res) => {
+      res.setHeader('Set-Cookie', `${COOKIE_NAME}=; HttpOnly; Path=/; Max-Age=0`);
+      res.redirect(LOGIN_PATH);
     });
   }
 
@@ -168,7 +161,7 @@ async function startWebUi(httpPort, verbose) {
     })
   );
 
-  app.get('/', (_req, res) => res.send(uiPageHtml(hadRefreshToken, refreshError)));
+  app.get('/', (_req, res) => res.send(uiPageHtml(hadRefreshToken, refreshError, UI_AUTH_ENABLED)));
 
   app.get(
     '/api/data',

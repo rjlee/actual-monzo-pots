@@ -64,4 +64,18 @@ describe('Web UI session-based authentication', () => {
     expect(res2.status).toBe(200);
     expect(res2.text).toMatch(/<title>actual-monzo-pots<\/title>/);
   });
+
+  it('logs out and shows login form again', async () => {
+    const loginRes = await request(server)
+      .post('/login?next=/')
+      .send('password=secret')
+      .set('Content-Type', 'application/x-www-form-urlencoded');
+    const cookie = loginRes.headers['set-cookie'][0];
+    const res = await request(server).post('/logout').set('Cookie', cookie);
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('/login');
+    const res3 = await request(server).get('/login');
+    expect(res3.status).toBe(200);
+    expect(res3.text).toMatch(/<h2[^>]*>Login<\/h2>/);
+  });
 });

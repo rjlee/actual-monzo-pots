@@ -122,7 +122,8 @@ npm run prepare
 Lint and format checks:
 
 ```bash
-npm run lint           # run ESLint
+npm run lint           # run ESLint and EJS template linting
+npm run lint:ejs       # check EJS templates for syntax errors
 npm run format         # auto-format code with Prettier
 npm run format:check   # verify code is formatted
 ```
