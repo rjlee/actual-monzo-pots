@@ -1,23 +1,13 @@
 /* eslint-env browser */
 // Global config passed from server-side EJS
-const { hadRefreshToken, refreshError } = window.__UI_CONFIG;
+const { hadRefreshToken } = window.__UI_CONFIG;
 
-// Update Monzo status badge
-if (hadRefreshToken) {
-  const authEl = document.getElementById('authStatus');
-  authEl.textContent = 'Monzo refreshing authentication';
-  authEl.className = 'badge bg-info';
-}
-if (refreshError != null) {
-  const authEl = document.getElementById('authStatus');
-  authEl.textContent = 'Monzo auth refresh failed: ' + refreshError;
-  authEl.className = 'badge bg-danger';
-}
 
 // Check for auth=success or auth=error in the URL
 (function () {
-  const params = new URLSearchParams(window.location.search);
   const statusEl = document.getElementById('status');
+  if (!statusEl) return;
+  const params = new URLSearchParams(window.location.search);
   if (params.get('auth') === 'success') {
     statusEl.textContent = 'Monzo authentication successful';
     statusEl.className = 'mt-4 text-center text-success';

@@ -47,10 +47,7 @@
   </div>
   <script>
     // Pass server data into front-end
-    window.__UI_CONFIG = {
-      hadRefreshToken: <%= hadRefreshToken %>,
-      refreshError: <%- JSON.stringify(refreshError) %>
-    };
+    window.__UI_CONFIG = { hadRefreshToken: <%= hadRefreshToken %> };
   </script>
   <script src="/js/index.js"></script>
 <%- include('footer') %>
