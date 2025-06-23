@@ -2,7 +2,6 @@
 // Global config passed from server-side EJS
 const { hadRefreshToken } = window.__UI_CONFIG;
 
-
 // Check for auth=success or auth=error in the URL
 (function () {
   const statusEl = document.getElementById('status');
