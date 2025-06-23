@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.7.0...v1.8.0) (2025-06-23)
+
+
+### Features
+
+* enhance transaction import process by adding payee lookup and creation ([0be2b10](https://github.com/rjlee/actual-monzo-pots/commit/0be2b102f0332aa5aaea49c200ac62924e593d79))
+
 # [1.7.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.6.0...v1.7.0) (2025-06-23)
 
 
