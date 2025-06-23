@@ -1,7 +1,8 @@
 require('dotenv').config();
-const fs = require('fs');
 const express = require('express');
 const logger = require('./logger');
+const fs = require('fs');
+const https = require('https');
 const config = require('./config');
 const { setupMonzo, openBudget } = require('./utils');
 const monzo = require('./monzo-client');
@@ -37,7 +38,6 @@ function uiPageHtml(hadRefreshToken, refreshError) {
           <th>Owner</th>
           <th>Type</th>
           <th>Account #</th>
-          <th>Sort Code</th>
           <th>Currency</th>
         </tr></thead>
         <tbody id="accountsBody"></tbody>
@@ -123,17 +123,16 @@ function uiPageHtml(hadRefreshToken, refreshError) {
           ac.description || ''
         );
         const ownerNames = ac.owners.map(o => o.preferred_name).join(', ');
-        return (
-          '<tr>' +
-            '<td>' + ac.id + '</td>' +
-            '<td>' + desc + '</td>' +
-            '<td>' + ownerNames + '</td>' +
-            '<td>' + ac.type + '</td>' +
-            '<td>' + (ac.account_number || '') + '</td>' +
-            '<td>' + (ac.sort_code     || '') + '</td>' +
-            '<td>' + ac.currency       + '</td>' +
-          '</tr>'
-        );
+      return (
+        '<tr>' +
+          '<td>' + ac.id + '</td>' +
+          '<td>' + desc + '</td>' +
+          '<td>' + ownerNames + '</td>' +
+          '<td>' + ac.type + '</td>' +
+          '<td>' + (ac.account_number || '') + '</td>' +
+          '<td>' + ac.currency + '</td>' +
+        '</tr>'
+      );
       }).join('');
       // Populate pot-account mapping table (including pot’s owning Monzo account and owner name)
       const tbody = document.getElementById('mappingBody');
@@ -270,6 +269,18 @@ async function startWebUi(httpPort, verbose) {
     });
   const app = express();
   app.use(express.json());
+
+  // If configured, serve over HTTPS using provided SSL key & cert
+  if (process.env.SSL_KEY && process.env.SSL_CERT) {
+    const sslOpts = {
+      key: fs.readFileSync(process.env.SSL_KEY),
+      cert: fs.readFileSync(process.env.SSL_CERT),
+    };
+    const server = https.createServer(sslOpts, app).listen(httpPort, () => {
+      logger.info({ port: httpPort }, 'Web UI HTTPS server listening');
+    });
+    return server;
+  }
 
   // Optional HTTP Basic Auth for Web UI (protects all routes)
   const UI_USER = process.env.UI_USER || 'admin';

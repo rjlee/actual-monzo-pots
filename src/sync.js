@@ -5,6 +5,7 @@ const config = require('./config');
 const monzo = require('./monzo-client');
 const { setupMonzo, openBudget, closeBudget } = require('./utils');
 const api = require('@actual-app/api');
+// Use addTransactions for raw imports (with imported_payee)
 
 /**
  * Sync Monzo pot balances to Actual Budget accounts.
@@ -89,14 +90,14 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
         continue;
       }
       log.info({ pot: pot.name, delta }, 'Syncing pot change');
-      // Import transaction to Actual Budget
+      // Import transaction to Actual Budget via addTransactions, setting imported_payee
       const tx = {
         id: `${pot.id}-${Date.now()}`,
         date: new Date(),
         amount: delta,
-        payee: 'actual-monzo-pots',
+        imported_payee: 'actual-monzo-pots',
       };
-      await api.importTransactions(acctId, [tx]);
+      await api.addTransactions(acctId, [tx], { runTransfers: false, learnCategories: false });
       entry.lastBalance = current;
       applied++;
     }

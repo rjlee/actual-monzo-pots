@@ -12,6 +12,8 @@ An application to sync Monzo Pot balances to Actual Budget accounts.
 
 ## Quick Start
 
+_Before you begin, please review the [Security Considerations](#security-considerations) section below._
+
 1. Register a new OAuth client on the Monzo Developer Portal (https://developers.monzo.com/) to obtain Monzo credentials:
    - Give your client a Name (displayed during the authorization prompt).
    - Set Redirect URL to `http://localhost:3000/auth/callback` (_or_ `http://<your_host>:${HTTP_PORT}/auth/callback` if you override `HTTP_PORT`).
@@ -28,12 +30,19 @@ An application to sync Monzo Pot balances to Actual Budget accounts.
    UI_PASSWORD=yourSecret # password to access the UI
    ```
 
+# Optionally enable HTTPS for the Web UI:
+
+SSL_KEY=/path/to/privkey.pem # path to SSL private key
+SSL_CERT=/path/to/fullchain.pem # path to SSL certificate chain
+
+````
+
 3. Copy `config.example.yaml` to `config.yaml` if you need to override defaults (schedule, HTTP_PORT, MAPPING_FILE).
 4. Build and run with Docker Compose:
 
-   ```bash
-   docker-compose up --build -d
-   ```
+```bash
+docker-compose up --build -d
+````
 
 _or_ run locally:
 
@@ -50,19 +59,33 @@ npm run daemon -- --ui [--verbose]
 > **Note:** To force a fresh Monzo OAuth token (e.g. after changing MONZO_SCOPES), delete
 > `data/monzo_refresh_token.txt`.
 
-> **Security note:** The web UI displays your Monzo pots and Actual Budget account details in your browser.
-> It only starts if you pass `--ui` or explicitly define an HTTP port (via `--http-port`, `config.yaml`/`config.yml`,
-> or `HTTP_PORT` in your environment).
-> To protect it with a password, define `UI_USER` and `UI_PASSWORD` in your `.env` or `config.yaml`:
->
-> ```bash
-> UI_USER=admin          # Basic‑Auth user (default: admin)
-> UI_PASSWORD=yourSecret # password to access the UI
-> ```
->
-> Restart the service; your browser will prompt for credentials before showing the UI. To remove password
-> protection, unset or clear `UI_PASSWORD`. To disable the Web UI entirely, omit any HTTP port setting and
-> do not pass the `--ui` flag (or remove the `ports:` mapping in `docker-compose.yml`).
+# Security Considerations
+
+> **Web UI security:** The Web UI displays your Monzo pots and Actual Budget account details in your browser.
+
+- **Password protection:** set `UI_USER` and `UI_PASSWORD` in your `.env` or `config.yaml`:
+
+  ```bash
+  UI_USER=admin          # Basic‑Auth user (default: admin)
+  UI_PASSWORD=yourSecret # password to access the UI
+
+  ```
+
+- **Monzo refresh token storage:** the Monzo refresh token is persisted unencrypted to the path defined by
+  `TOKEN_DIRECTORY` and `TOKEN_FILE` (default `./data/monzo_refresh_token.txt`). Protect this directory
+  with appropriate filesystem permissions and physical security to prevent unauthorized access.
+
+- **TLS/HTTPS:** to serve the UI over HTTPS (strongly recommended in production), set:
+
+  ```bash
+  SSL_KEY=/path/to/privkey.pem    # path to SSL private key
+  SSL_CERT=/path/to/fullchain.pem # path to SSL certificate chain
+  ```
+
+- **Disable Web UI:** once configuration is complete, you can turn off the Web UI entirely:
+  - **Locally:** omit the `--ui` flag and remove any `http-port` setting from your `config.yaml` or `.env`,
+    or use one-shot sync (`npm run sync`).
+  - **Docker Compose:** remove or comment out the `ports:` mapping or web service definition in `docker-compose.yml`.
 
 ## Configuration
 

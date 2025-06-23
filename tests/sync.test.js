@@ -42,13 +42,15 @@ describe('runSync', () => {
     // stub Actual Budget accounts, balance and import
     api.getAccounts.mockResolvedValue([{ id: 'a1' }]);
     api.getAccountBalance.mockResolvedValue(50);
-    api.importTransactions.mockResolvedValue();
+    api.addTransactions.mockResolvedValue();
 
     const count = await runSync({ useLogger: false });
     expect(count).toBe(1);
-    expect(api.importTransactions).toHaveBeenCalledWith('a1', [
-      expect.objectContaining({ amount: 150, payee: 'actual-monzo-pots' }),
-    ]);
+    expect(api.addTransactions).toHaveBeenCalledWith(
+      'a1',
+      [expect.objectContaining({ amount: 150, imported_payee: 'actual-monzo-pots' })],
+      { runTransfers: false, learnCategories: false }
+    );
     // mapping.json updated to new balance
     const updated = JSON.parse(fs.readFileSync(mappingFile, 'utf8'));
     expect(updated[0].lastBalance).toBe(200);
