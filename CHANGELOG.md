@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.4.0...v1.5.0) (2025-06-23)
+
+
+### Features
+
+* add HTTP Basic Auth to Web UI for enhanced security and implement tests for authentication ([9dd7c39](https://github.com/rjlee/actual-monzo-pots/commit/9dd7c39c32f40697b7d88c4d835c71e4856d1356))
+
 # [1.4.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.3.1...v1.4.0) (2025-06-23)
 
 
