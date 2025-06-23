@@ -31,7 +31,7 @@ async function main(args = process.argv.slice(2)) {
     })
     .option('http-port', {
       type: 'number',
-      default: parseInt(config.HTTP_PORT || process.env.HTTP_PORT || 3000, 10),
+      default: parseInt(config.httpPort ?? config.HTTP_PORT ?? process.env.HTTP_PORT ?? 3000, 10),
       describe: 'Port for web UI server',
     })
     .help().argv;

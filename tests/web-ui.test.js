@@ -77,7 +77,7 @@ describe('GET /api/data', () => {
   it('serves the UI HTML at root', async () => {
     const res = await request(server).get('/');
     expect(res.status).toBe(200);
-    expect(res.text).toMatch(/<title>Monzo Pots Sync<\/title>/);
+    expect(res.text).toMatch(/<title>actual-monzo-pots<\/title>/);
     expect(res.text).toMatch(/<script>/);
   });
 

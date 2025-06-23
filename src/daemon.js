@@ -49,7 +49,9 @@ function scheduleSync(verbose) {
  */
 async function runDaemon({ verbose, ui, httpPort }) {
   const explicitPort =
-    typeof config.HTTP_PORT !== 'undefined' || typeof process.env.HTTP_PORT !== 'undefined';
+    typeof config.httpPort !== 'undefined' ||
+    typeof config.HTTP_PORT !== 'undefined' ||
+    typeof process.env.HTTP_PORT !== 'undefined';
   if (ui || explicitPort) {
     // Launch Web UI server and catch errors to avoid unhandled promise rejections
     Promise.resolve(startWebUi(httpPort, verbose)).catch((err) => {

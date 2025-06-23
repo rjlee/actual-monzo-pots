@@ -17,12 +17,12 @@ function uiPageHtml(hadRefreshToken, refreshError) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Monzo Pots Sync</title>
+  <title>actual-monzo-pots</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
     <div class="container py-5">
-    <h1 class="mb-4 text-center">Monzo Pots Sync</h1>
+    <h1 class="mb-4 text-center">actual-monzo-pots</h1>
     <div class="d-flex justify-content-between align-items-center mb-4">
       <a href="/auth" class="btn btn-secondary">Authenticate Monzo</a>
       <span id="authStatus" class="badge bg-warning">Monzo not authenticated</span>
@@ -149,7 +149,7 @@ function uiPageHtml(hadRefreshToken, refreshError) {
           : '';
         return (
           '<tr>' +
-            '<td>' + pot.name + ' (' + (pot.balance / 100).toFixed(2) + ' ' + pot.currency + ')</td>' +
+            '<td>' + pot.name + '</td>' +
             '<td>' + pot.current_account_id + '</td>' +
             '<td>' + owner + '</td>' +
             '<td><select data-pot="' + pot.id + '" class="form-select"' +

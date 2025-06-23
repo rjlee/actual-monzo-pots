@@ -42,6 +42,16 @@ npm run daemon -- --ui [--verbose]
 > **Note:** To force a fresh Monzo OAuth token (e.g. after changing MONZO_SCOPES), delete
 > `data/monzo_refresh_token.txt`.
 
+> **Security note:** The web UI displays your Monzo pots and Actual Budget account details in your browser.
+> It only starts if you pass `--ui` or explicitly define an HTTP port (via `--http-port`, `config.yaml`/`config.yml`,
+> or `HTTP_PORT` in your environment).
+> Once you have configured your mappings and confirmed everything is working,
+> disable the web UI to avoid exposing financial data:
+>
+> - **Locally:** omit the `--ui` flag and remove the `http-port` setting from your `config.yaml` or `.env`,
+>   or use one-shot sync mode (`npm run sync`).
+> - **Docker Compose:** remove or comment out the `ports:` mapping or the web service definition in `docker-compose.yml`.
+
 ## Configuration
 
 See `.env.example` and `config.example.yaml` for available options.
