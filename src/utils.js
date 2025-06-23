@@ -38,18 +38,11 @@ async function openBudget() {
   logger.info('Connecting to Actual API...');
   await api.init({ dataDir, serverURL: url, password });
 
-  logger.info('Downloading budget...');
+  logger.info('Downloading budget (no backup)...');
   const opts = {};
   const budgetPassword = process.env.ACTUAL_BUDGET_ENCRYPTION_PASSWORD;
   if (budgetPassword) opts.password = budgetPassword;
-  try {
-    await api.runImport('open-budget', async () => {
-      await api.downloadBudget(process.env.ACTUAL_BUDGET_ID, opts);
-    });
-  } catch (err) {
-    logger.warn('runImport failed, falling back to direct downloadBudget');
-    await api.downloadBudget(process.env.ACTUAL_BUDGET_ID, opts);
-  }
+  await api.downloadBudget(process.env.ACTUAL_BUDGET_ID, opts);
   logger.info('Budget downloaded');
 }
 

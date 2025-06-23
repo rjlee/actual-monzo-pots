@@ -74,7 +74,7 @@ describe('openBudget', () => {
       serverURL: 'http://example.com',
       password: 'pw',
     });
-    expect(api.runImport).toHaveBeenCalledWith('open-budget', expect.any(Function));
+    // runImport is no longer used (no backup); downloadBudget is called directly
     expect(api.downloadBudget).toHaveBeenCalledWith('budget1', {});
   });
 
