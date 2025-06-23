@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.8.0...v1.9.0) (2025-06-23)
+
+
+### Features
+
+* wrap openBudget call in Promise.resolve to handle sync errors ([be3be2c](https://github.com/rjlee/actual-monzo-pots/commit/be3be2c5e233b242f56d0421fbcb580d9a9cd091))
+
 # [1.8.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.7.0...v1.8.0) (2025-06-23)
 
 
