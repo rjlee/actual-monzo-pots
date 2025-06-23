@@ -47,7 +47,7 @@ describe('runSync', () => {
     const count = await runSync({ useLogger: false });
     expect(count).toBe(1);
     expect(api.importTransactions).toHaveBeenCalledWith('a1', [
-      expect.objectContaining({ amount: 150, payee: 'TestPot' }),
+      expect.objectContaining({ amount: 150, payee: 'actual-monzo-pots' }),
     ]);
     // mapping.json updated to new balance
     const updated = JSON.parse(fs.readFileSync(mappingFile, 'utf8'));

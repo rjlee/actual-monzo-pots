@@ -7,9 +7,11 @@ const { setupMonzo, openBudget } = require('./utils');
 const monzo = require('./monzo-client');
 const api = require('@actual-app/api');
 const { runSync } = require('./sync');
+// Helper to wrap async route handlers and forward errors to the global error handler
+const asyncHandler = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 // Generate the HTML for the UI page
-function uiPageHtml() {
+function uiPageHtml(hadRefreshToken, refreshError) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,11 +62,16 @@ function uiPageHtml() {
   </div>
   <script>
     // Indicate prior Monzo authentication via stored refresh token
-    const initialHasRefreshToken = ${JSON.stringify(Boolean(monzo.refreshToken))};
-    if (initialHasRefreshToken) {
+    if (${hadRefreshToken}) {
       const authEl = document.getElementById('authStatus');
       authEl.textContent = 'Monzo refreshing authentication';
       authEl.className = 'badge bg-info';
+    }
+    // Show refresh error if initial Monzo token refresh failed
+    if (${refreshError != null}) {
+      const authEl = document.getElementById('authStatus');
+      authEl.textContent = 'Monzo auth refresh failed: ' + ${JSON.stringify(refreshError)};
+      authEl.className = 'badge bg-danger';
     }
     // Display OAuth callback status
     (function() {
@@ -181,25 +188,48 @@ function uiPageHtml() {
       loadData(true);
     }
     document.getElementById('saveBtn').onclick = async () => {
-      const newMap = [];
-      document.querySelectorAll('select[data-pot]').forEach(sel => {
-        const potId = sel.getAttribute('data-pot');
-        const accountId = sel.value;
-        const existing = mapping.find(m => m.potId === potId);
-        newMap.push({ potId, accountId, lastBalance: existing?.lastBalance || 0 });
-      });
-      await fetch('/api/mappings', {
-        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(newMap)
-      });
-      document.getElementById('status').textContent = 'Mappings saved.';
-      await loadData(true);
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = 'Saving mappings...';
+      try {
+        const newMap = [];
+        document.querySelectorAll('select[data-pot]').forEach(sel => {
+          const potId = sel.getAttribute('data-pot');
+          const accountId = sel.value;
+          const existing = mapping.find(m => m.potId === potId);
+          newMap.push({ potId, accountId, lastBalance: existing?.lastBalance || 0 });
+        });
+        const res = await fetch('/api/mappings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newMap),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'Failed to save mappings');
+        }
+        statusEl.textContent = 'Mappings saved.';
+        await loadData(true);
+      } catch (err) {
+        statusEl.textContent = 'Error saving mappings: ' + err.message;
+      }
     };
-    document.getElementById('syncBtn').onclick = async () => {
-      const status = document.getElementById('status');
-      status.textContent = 'Syncing...';
-      const res = await fetch('/api/sync', { method: 'POST' });
-      const json = await res.json();
-      status.textContent = json.message || ('Synced ' + json.count + ' pot(s)');
+    const syncBtn = document.getElementById('syncBtn');
+    syncBtn.onclick = async () => {
+      const statusEl = document.getElementById('status');
+      syncBtn.disabled = true;
+      statusEl.textContent = 'Syncing...';
+      try {
+        const res = await fetch('/api/sync', { method: 'POST' });
+        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(json.error || 'Failed to sync');
+        }
+        statusEl.textContent = json.message || ('Synced ' + json.count + ' pot(s)');
+      } catch (err) {
+        statusEl.textContent = 'Error syncing: ' + err.message;
+      } finally {
+        syncBtn.disabled = false;
+      }
     };
     // Initial data load (e.g. Monzo auth status), then poll budget until ready
     loadData(false);
@@ -213,7 +243,21 @@ function uiPageHtml() {
  * Launch the Express-based UI server
  */
 async function startWebUi(httpPort, verbose) {
-  await setupMonzo();
+  // Attempt to refresh Monzo access token (if a refresh token exists), track status for UI
+  // Determine if a stored refresh token exists, then attempt to refresh it, capturing any error
+  const tokenFilePath = monzo.tokenDir && monzo.tokenFile
+    ? `${monzo.tokenDir}/${monzo.tokenFile}`
+    : null;
+  let hadRefreshToken = tokenFilePath && fs.existsSync(tokenFilePath);
+  let refreshError = null;
+  if (hadRefreshToken) {
+    try {
+      await setupMonzo();
+    } catch (err) {
+      logger.error({ err }, 'Monzo refresh failed');
+      refreshError = err.message;
+    }
+  }
   // Kick off budget download in background; UI will poll for readiness
   let budgetReady = false;
   openBudget()
@@ -243,7 +287,7 @@ async function startWebUi(httpPort, verbose) {
 
   // OAuth endpoints for Monzo
   app.get('/auth', (_req, res) => monzo.authorize(res));
-  app.get('/auth/callback', async (req, res) => {
+  app.get('/auth/callback', asyncHandler(async (req, res) => {
     const { code, state } = req.query;
     try {
       await monzo.handleCallback(code, state);
@@ -253,11 +297,11 @@ async function startWebUi(httpPort, verbose) {
       // Redirect back with error message for UI display
       return res.redirect('/?auth=error&message=' + encodeURIComponent(err.message));
     }
-  });
+  }));
 
-  app.get('/', (_req, res) => res.send(uiPageHtml()));
+  app.get('/', (_req, res) => res.send(uiPageHtml(hadRefreshToken, refreshError)));
 
-  app.get('/api/data', async (_req, res) => {
+  app.get('/api/data', asyncHandler(async (_req, res) => {
     // Require Monzo authentication to fetch data
     if (!monzo.isAuthenticated()) {
       return res.status(401).end();
@@ -298,7 +342,7 @@ async function startWebUi(httpPort, verbose) {
     const authenticated = monoAccounts.length > 0;
     logger.info({ authenticated }, 'Monzo authentication status');
     return res.json({ monoAccounts, pots, accounts: accountsList, mapping, authenticated });
-  });
+  }));
 
   // Provide budget download status for client polling
   app.get('/api/budget-status', (_req, res) => {
@@ -310,13 +354,19 @@ async function startWebUi(httpPort, verbose) {
     res.json({ success: true });
   });
 
-  app.post('/api/sync', async (_req, res) => {
-    try {
-      const count = await runSync({ verbose: false, useLogger: true });
-      res.json({ count });
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+  app.post('/api/sync', asyncHandler(async (_req, res) => {
+    const count = await runSync({ verbose: false, useLogger: true });
+    res.json({ count });
+  }));
+
+  // NOTE: this must be after all route handlers to catch any errors
+  // Global error handler for UI routes
+  app.use((err, req, res, next) => {
+    logger.error({ err, method: req.method, url: req.url }, 'Web UI route error');
+    if (res.headersSent) {
+      return next(err);
     }
+    res.status(500).json({ error: err.message });
   });
 
   const server = app.listen(httpPort, () => {

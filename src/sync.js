@@ -25,7 +25,11 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
   try {
     const data = fs.readFileSync(mappingPath, 'utf8');
     mapping = JSON.parse(data);
-  } catch (_) {
+  } catch (err) {
+    log.warn(
+      { err, mappingPath },
+      'Failed to load or parse mapping file; starting with empty mapping'
+    );
     mapping = [];
   }
   if (verbose) log.debug({ mappingPath, count: mapping.length }, 'Loaded mapping entries');
@@ -90,15 +94,21 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
         id: `${pot.id}-${Date.now()}`,
         date: new Date(),
         amount: delta,
-        payee: pot.name,
+        payee: 'actual-monzo-pots',
       };
       await api.importTransactions(acctId, [tx]);
       entry.lastBalance = current;
       applied++;
     }
 
-    // Save updated mapping
-    fs.writeFileSync(mappingPath, JSON.stringify(mapping, null, 2));
+    // Save updated mapping atomically
+    try {
+      const tmpFile = `${mappingPath}.tmp`;
+      fs.writeFileSync(tmpFile, JSON.stringify(mapping, null, 2));
+      fs.renameSync(tmpFile, mappingPath);
+    } catch (err) {
+      log.error({ err, mappingPath }, 'Failed to save mapping file atomically');
+    }
     log.info({ applied }, 'Completed pot sync');
   } catch (err) {
     log.error({ err }, 'Error during sync');

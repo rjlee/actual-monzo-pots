@@ -50,10 +50,15 @@ function scheduleSync(verbose) {
 async function runDaemon({ verbose, ui, httpPort }) {
   const explicitPort =
     typeof config.HTTP_PORT !== 'undefined' || typeof process.env.HTTP_PORT !== 'undefined';
-  if (ui || explicitPort) startWebUi(httpPort, verbose);
-  // Use exported function to allow test spies to intercept calls
-  const { scheduleSync } = require('./daemon');
-  scheduleSync(verbose);
+  if (ui || explicitPort) {
+    // Launch Web UI server and catch errors to avoid unhandled promise rejections
+    Promise.resolve(startWebUi(httpPort, verbose)).catch((err) => {
+      logger.error({ err }, 'Web UI server failed');
+    });
+  }
+  // Schedule periodic sync jobs
+  // Use module.exports so jest.spyOn on scheduleSync is applied to this call
+  module.exports.scheduleSync(verbose);
 }
 
 module.exports = { runDaemon, scheduleSync };
