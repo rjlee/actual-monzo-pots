@@ -1,3 +1,15 @@
+# [1.12.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.11.0...v1.12.0) (2025-06-23)
+
+
+### Bug Fixes
+
+* update ejs-lint command to use npx for consistency ([0f6c5f0](https://github.com/rjlee/actual-monzo-pots/commit/0f6c5f086abd5aa0548e1f21111488a257d27e6f))
+
+
+### Features
+
+* update project to support EJS templates and enhance authentication flow ([1942d6c](https://github.com/rjlee/actual-monzo-pots/commit/1942d6c935e149f446da0d275d64d8254ef43948))
+
 # [1.11.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.10.0...v1.11.0) (2025-06-23)
 
 
