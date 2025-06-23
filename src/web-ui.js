@@ -5,7 +5,7 @@ const ejs = require('ejs');
 const logger = require('./logger');
 const fs = require('fs');
 const https = require('https');
-// Simple session cookie parsing without external deps
+const cookieSession = require('cookie-session');
 const config = require('./config');
 const { setupMonzo, openBudget } = require('./utils');
 const monzo = require('./monzo-client');
@@ -84,10 +84,7 @@ async function startWebUi(httpPort, verbose) {
     return server;
   }
 
-  // Session-based UI authentication (uses ACTUAL_PASSWORD); simple cookie approach
   const UI_AUTH_ENABLED = process.env.UI_AUTH_ENABLED !== 'false';
-  const LOGIN_PATH = '/login';
-  const COOKIE_NAME = 'ui-auth';
   if (UI_AUTH_ENABLED) {
     const SECRET = process.env.ACTUAL_PASSWORD;
     if (!SECRET) {
@@ -95,38 +92,44 @@ async function startWebUi(httpPort, verbose) {
       process.exit(1);
     }
     app.use(express.urlencoded({ extended: false }));
+    app.use(
+      cookieSession({
+        name: 'session',
+        keys: [process.env.SESSION_SECRET || SECRET],
+        maxAge: 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: Boolean(process.env.SSL_KEY && process.env.SSL_CERT),
+        sameSite: 'strict',
+      })
+    );
 
-    const loginForm = (error) => {
+    const LOGIN_PATH = '/login';
+    /* eslint-disable no-inner-declarations */
+    function loginForm(error) {
       const templatePath = path.join(__dirname, 'views', 'login.ejs');
       const template = fs.readFileSync(templatePath, 'utf8');
       return ejs.render(template, { error, LOGIN_PATH }, { filename: templatePath });
-    };
+    }
 
+    /* eslint-enable no-inner-declarations */
+    app.get(LOGIN_PATH, (_req, res) => res.send(loginForm()));
     app.post(LOGIN_PATH, (req, res) => {
       if (req.body.password === SECRET) {
-        res.setHeader('Set-Cookie', `${COOKIE_NAME}=1; HttpOnly; Path=/`);
+        req.session.authenticated = true;
         return res.redirect(req.query.next || '/');
       }
       return res.status(401).send(loginForm('Invalid password'));
     });
 
-    // Show login form on GET /login
-    app.get(LOGIN_PATH, (_req, res) => res.send(loginForm()));
-
     app.use((req, res, next) => {
-      // Check for our session cookie
-      const header = req.headers.cookie || '';
-      const cookies = header.split(';').map((c) => c.trim());
-      if (cookies.includes(`${COOKIE_NAME}=1`)) {
+      if (req.session.authenticated) {
         return next();
       }
-      // All other unauthenticated requests show the login form
       return res.send(loginForm());
     });
 
-    // Logout endpoint – clears session cookie and redirects to login page
     app.post('/logout', (req, res) => {
-      res.setHeader('Set-Cookie', `${COOKIE_NAME}=; HttpOnly; Path=/; Max-Age=0`);
+      req.session = null;
       res.redirect(LOGIN_PATH);
     });
   }

@@ -30,6 +30,7 @@
     "pino": "^8.0.0",
     "yargs": "^17.7.2",
     "uuid": "^9.0.0",
+    "cookie-session": "^2.0.0",
     "ejs-lint": "^1.0.1"
   },
   "devDependencies": {

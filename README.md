@@ -23,14 +23,17 @@ _Before you begin, please review the [Security Considerations](#security-conside
    `MONZO_SCOPES`) and your Actual Budget settings (`ACTUAL_SERVER_URL`, `ACTUAL_BUDGET_ID`,
    `ACTUAL_BUDGET_ENCRYPTION_PASSWORD` if your budget file is encrypted).
 
-   **Session-based UI authentication:** set `ACTUAL_PASSWORD` to require a login form for the Web UI.
-   To disable authentication (i.e. allow open access), set `UI_AUTH_ENABLED=false`.
+Session-based UI authentication is enabled by default. A signed session cookie is used (`cookie-session` with a shared secret).
+The signing key comes from `SESSION_SECRET` (falling back to `ACTUAL_PASSWORD` if unset).
 
-   ```bash
-   ACTUAL_PASSWORD=yourBudgetPassword
-   # To disable login form:
-   # UI_AUTH_ENABLED=false
-   ```
+Set your password and session secret:
+
+```bash
+ACTUAL_PASSWORD=yourBudgetPassword
+SESSION_SECRET=someLongRandomString
+# To disable login form (allow open access):
+UI_AUTH_ENABLED=false
+```
 
 # Optionally enable HTTPS for the Web UI:
 
@@ -65,13 +68,14 @@ npm run daemon -- --ui [--verbose]
 
 > **Web UI security:** The Web UI displays your Monzo pots and Actual Budget account details in your browser.
 
-- **Session-based UI authentication** (default on): set `ACTUAL_PASSWORD` to require a password‑based login form.
-  To disable login form (allow open access), set `UI_AUTH_ENABLED=false`.
+- **Session-based UI authentication** (enabled by default): requires a signed session cookie (`cookie-session` with `SESSION_SECRET`).
+  To disable the login form (open access), set `UI_AUTH_ENABLED=false`.
 
 ```bash
 ACTUAL_PASSWORD=yourBudgetPassword
+SESSION_SECRET=someLongRandomString
 # To disable login form:
-# UI_AUTH_ENABLED=false
+UI_AUTH_ENABLED=false
 ```
 
 - **Monzo refresh token storage:** the Monzo refresh token is persisted unencrypted to the path defined by

@@ -58,9 +58,10 @@ describe('Web UI session-based authentication', () => {
       .send('password=secret')
       .set('Content-Type', 'application/x-www-form-urlencoded');
     expect(res.status).toBe(302);
-    const cookie = res.headers['set-cookie'][0];
-    expect(cookie).toMatch(/ui-auth=/);
-    const res2 = await request(server).get('/').set('Cookie', cookie);
+    const cookies = res.headers['set-cookie'];
+    expect(cookies.some((c) => /session=/.test(c))).toBe(true);
+    const cookieHeader = cookies.map((c) => c.split(';')[0]).join('; ');
+    const res2 = await request(server).get('/').set('Cookie', cookieHeader);
     expect(res2.status).toBe(200);
     expect(res2.text).toMatch(/<title>actual-monzo-pots<\/title>/);
   });
@@ -70,8 +71,9 @@ describe('Web UI session-based authentication', () => {
       .post('/login?next=/')
       .send('password=secret')
       .set('Content-Type', 'application/x-www-form-urlencoded');
-    const cookie = loginRes.headers['set-cookie'][0];
-    const res = await request(server).post('/logout').set('Cookie', cookie);
+    const cookies = loginRes.headers['set-cookie'];
+    const cookieHeader = cookies.map((c) => c.split(';')[0]).join('; ');
+    const res = await request(server).post('/logout').set('Cookie', cookieHeader);
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe('/login');
     const res3 = await request(server).get('/login');
