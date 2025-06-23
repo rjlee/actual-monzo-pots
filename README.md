@@ -20,6 +20,14 @@ An application to sync Monzo Pot balances to Actual Budget accounts.
 2. Copy `.env.example` to `.env` and fill in your Monzo credentials (CLIENT_ID, CLIENT_SECRET, REDIRECT_URI,
    MONZO_SCOPES) and your Actual Budget settings (ACTUAL_SERVER_URL, ACTUAL_PASSWORD, ACTUAL_BUDGET_ID,
    ACTUAL_BUDGET_ENCRYPTION_PASSWORD if your budget file is encrypted).
+   You can also optionally set `UI_USER` and `UI_PASSWORD` to password-protect the UI as it contains
+   financial information:
+
+   ```bash
+   UI_USER=admin          # Basic‑Auth user (default: admin)
+   UI_PASSWORD=yourSecret # password to access the UI
+   ```
+
 3. Copy `config.example.yaml` to `config.yaml` if you need to override defaults (schedule, HTTP_PORT, MAPPING_FILE).
 4. Build and run with Docker Compose:
 
