@@ -87,7 +87,10 @@
         return;
       }
       if (res.status === 401) {
-        window.location.href = '/auth';
+        // Only auto-redirect to Monzo auth if a refresh token existed
+        if (hadRefreshToken) {
+          window.location.href = '/auth';
+        }
         return;
       }
       const json = await res.json();

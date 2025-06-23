@@ -87,16 +87,36 @@ async function startWebUi(httpPort, verbose) {
     }
     app.use(express.urlencoded({ extended: false }));
 
-    const loginForm = (error) =>
-      '<!DOCTYPE html><html><body>' +
-      '<h1>Login</h1>' +
-      (error ? '<p style="color:red">' + error + '</p>' : '') +
-      '<form method="post" action="' +
-      LOGIN_PATH +
-      '">' +
-      '<input type="password" name="password" placeholder="Password" autofocus />' +
-      '<button>Log in</button>' +
-      '</form></body></html>';
+    const loginForm = (error) => `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>actual-monzo-pots Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="mb-4 text-center">actual-monzo-pots</h1>
+    <div class="row justify-content-center">
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="card-title text-center mb-4">Login</h2>
+            ${error ? `<div class="alert alert-danger text-center">${error}</div>` : ''}
+            <form method="post" action="${LOGIN_PATH}">
+              <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Password" autofocus />
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Log in</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
 
     app.post(LOGIN_PATH, (req, res) => {
       if (req.body.password === SECRET) {

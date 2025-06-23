@@ -19,15 +19,17 @@ _Before you begin, please review the [Security Considerations](#security-conside
    - Set Redirect URL to `http://localhost:3000/auth/callback` (_or_ `http://<your_host>:${HTTP_PORT}/auth/callback` if you override `HTTP_PORT`).
    - Set Confidentiality to "Confidential".
      After submission, note the Client ID and Client Secret values, then set `REDIRECT_URI` to your callback URL (e.g. `http://localhost:3000/auth/callback`).
-2. Copy `.env.example` to `.env` and fill in your Monzo credentials (CLIENT_ID, CLIENT_SECRET, REDIRECT_URI,
-   MONZO_SCOPES) and your Actual Budget settings (ACTUAL_SERVER_URL, ACTUAL_PASSWORD, ACTUAL_BUDGET_ID,
-   ACTUAL_BUDGET_ENCRYPTION_PASSWORD if your budget file is encrypted).
-   You can also optionally set `UI_USER` and `UI_PASSWORD` to password-protect the UI as it contains
-   financial information:
+2. Copy `.env.example` to `.env` and fill in your Monzo credentials (`CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`,
+   `MONZO_SCOPES`) and your Actual Budget settings (`ACTUAL_SERVER_URL`, `ACTUAL_BUDGET_ID`,
+   `ACTUAL_BUDGET_ENCRYPTION_PASSWORD` if your budget file is encrypted).
+
+   **Session-based UI authentication:** set `ACTUAL_PASSWORD` to require a login form for the Web UI.
+   To disable authentication (i.e. allow open access), set `UI_AUTH_ENABLED=false`.
 
    ```bash
-   UI_USER=admin          # Basic‑Auth user (default: admin)
-   UI_PASSWORD=yourSecret # password to access the UI
+   ACTUAL_PASSWORD=yourBudgetPassword
+   # To disable login form:
+   # UI_AUTH_ENABLED=false
    ```
 
 # Optionally enable HTTPS for the Web UI:
@@ -63,19 +65,13 @@ npm run daemon -- --ui [--verbose]
 
 > **Web UI security:** The Web UI displays your Monzo pots and Actual Budget account details in your browser.
 
-- **Session-based UI authentication:** configure with your `ACTUAL_PASSWORD` (Basic Auth via `UI_USER`/`UI_PASSWORD` is no longer supported):
+- **Session-based UI authentication** (default on): set `ACTUAL_PASSWORD` to require a password‑based login form.
+  To disable login form (allow open access), set `UI_AUTH_ENABLED=false`.
 
 ```bash
-  UI_USER=admin                  # deprecated; remove this setting
-  UI_PASSWORD=yourSecret         # deprecated; remove this setting
-  ACTUAL_PASSWORD=yourBudgetPass # require for session-based login
-  UI_AUTH_ENABLED=true           # enable session-based UI auth (default: true)
-```
-
-```bash
-UI_USER=admin          # Basic‑Auth user (default: admin)
-UI_PASSWORD=yourSecret # password to access the UI
-
+ACTUAL_PASSWORD=yourBudgetPassword
+# To disable login form:
+# UI_AUTH_ENABLED=false
 ```
 
 - **Monzo refresh token storage:** the Monzo refresh token is persisted unencrypted to the path defined by

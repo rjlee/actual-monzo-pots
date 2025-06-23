@@ -40,7 +40,7 @@ describe('Web UI session-based authentication', () => {
   it('shows login form for unauthenticated users', async () => {
     const res = await request(server).get('/');
     expect(res.status).toBe(200);
-    expect(res.text).toMatch(/<h1>Login<\/h1>/);
+    expect(res.text).toMatch(/<h2[^>]*>Login<\/h2>/);
   });
 
   it('rejects invalid login attempts', async () => {
