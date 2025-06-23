@@ -149,3 +149,5 @@ Release process:
 npm run prerelease     # lint, format-check, and test before releasing
 npm run release        # create a new release with semantic-release
 ```
+
+> **Disclaimer:** Users run this software at their own risk; no warranties are provided, and the authors are not liable for any data loss or unintended side effects.
