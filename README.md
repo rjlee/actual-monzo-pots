@@ -45,12 +45,16 @@ npm run daemon -- --ui [--verbose]
 > **Security note:** The web UI displays your Monzo pots and Actual Budget account details in your browser.
 > It only starts if you pass `--ui` or explicitly define an HTTP port (via `--http-port`, `config.yaml`/`config.yml`,
 > or `HTTP_PORT` in your environment).
-> Once you have configured your mappings and confirmed everything is working,
-> disable the web UI to avoid exposing financial data:
+> To protect it with a password, define `UI_USER` and `UI_PASSWORD` in your `.env` or `config.yaml`:
 >
-> - **Locally:** omit the `--ui` flag and remove the `http-port` setting from your `config.yaml` or `.env`,
->   or use one-shot sync mode (`npm run sync`).
-> - **Docker Compose:** remove or comment out the `ports:` mapping or the web service definition in `docker-compose.yml`.
+> ```bash
+> UI_USER=admin          # Basic‑Auth user (default: admin)
+> UI_PASSWORD=yourSecret # password to access the UI
+> ```
+>
+> Restart the service; your browser will prompt for credentials before showing the UI. To remove password
+> protection, unset or clear `UI_PASSWORD`. To disable the Web UI entirely, omit any HTTP port setting and
+> do not pass the `--ui` flag (or remove the `ports:` mapping in `docker-compose.yml`).
 
 ## Configuration
 

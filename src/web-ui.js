@@ -271,6 +271,26 @@ async function startWebUi(httpPort, verbose) {
   const app = express();
   app.use(express.json());
 
+  // Optional HTTP Basic Auth for Web UI (protects all routes)
+  const UI_USER = process.env.UI_USER || 'admin';
+  const UI_PASSWORD = process.env.UI_PASSWORD;
+  if (UI_PASSWORD) {
+    app.use((req, res, next) => {
+      const auth = req.headers.authorization || '';
+      const [scheme, credentials] = auth.split(' ');
+      if (scheme !== 'Basic' || !credentials) {
+        res.set('WWW-Authenticate', 'Basic realm="actual-monzo-pots UI"');
+        return res.status(401).send('Authentication required.');
+      }
+      const [user, pass] = Buffer.from(credentials, 'base64').toString().split(':');
+      if (user !== UI_USER || pass !== UI_PASSWORD) {
+        res.set('WWW-Authenticate', 'Basic realm="actual-monzo-pots UI"');
+        return res.status(401).send('Invalid credentials.');
+      }
+      next();
+    });
+  }
+
   // Log HTTP requests (basic info always; more details if verbose)
   app.use((req, res, next) => {
     const meta = { method: req.method, url: req.url };
