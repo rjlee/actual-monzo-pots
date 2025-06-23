@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.6.0...v1.7.0) (2025-06-23)
+
+
+### Features
+
+* enhance README with security considerations and update sync logic for transaction imports ([4682c08](https://github.com/rjlee/actual-monzo-pots/commit/4682c0855d4e612bf25baa3f27e573fc59b0a036))
+
 # [1.6.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.5.0...v1.6.0) (2025-06-23)
 
 
