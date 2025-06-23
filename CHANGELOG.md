@@ -1,3 +1,13 @@
+# [1.10.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.9.0...v1.10.0) (2025-06-23)
+
+
+### Features
+
+* implement session-based authentication for Web UI and update README ([15343a5](https://github.com/rjlee/actual-monzo-pots/commit/15343a54ee4485512e1a64d43fb4fecaf37e1144))
+* refactor loginForm HTML generation for improved readability ([93b9832](https://github.com/rjlee/actual-monzo-pots/commit/93b98321c374dc234b5db3fa3d101863db8b2548))
+* simplify openBudget function by removing runImport and directly calling downloadBudget ([51c9a06](https://github.com/rjlee/actual-monzo-pots/commit/51c9a069ceac589dc6d470c81a2c6ecaa39d1a11))
+* update package.json and package-lock.json for version 1.9.0, add ejs dependency, and create HTML templates for the UI ([629185a](https://github.com/rjlee/actual-monzo-pots/commit/629185ab34c94145d513fb755c86ed7dc79bd7b0))
+
 # [1.9.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.8.0...v1.9.0) (2025-06-23)
 
 
