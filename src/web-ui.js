@@ -258,7 +258,8 @@ async function startWebUi(httpPort, verbose) {
   }
   // Kick off budget download in background; UI will poll for readiness
   let budgetReady = false;
-  openBudget()
+  // Kick off budget download in background; wrap in Promise.resolve to catch sync throws
+  Promise.resolve(openBudget())
     .then(() => {
       budgetReady = true;
     })
