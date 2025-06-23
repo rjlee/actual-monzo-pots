@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.5.0...v1.6.0) (2025-06-23)
+
+
+### Features
+
+* update README to include optional UI authentication setup for enhanced security ([802418a](https://github.com/rjlee/actual-monzo-pots/commit/802418a0dda51b5375ab111ad9601fef781ab6d0))
+
 # [1.5.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.4.0...v1.5.0) (2025-06-23)
 
 
