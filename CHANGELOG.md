@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.10.0...v1.11.0) (2025-06-23)
+
+
+### Features
+
+* enhance session-based authentication and improve login UI design ([81d468c](https://github.com/rjlee/actual-monzo-pots/commit/81d468ca8453335bd7251e98000522160ec98595))
+
 # [1.10.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.9.0...v1.10.0) (2025-06-23)
 
 
