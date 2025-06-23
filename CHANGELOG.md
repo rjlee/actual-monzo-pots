@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.3.1...v1.4.0) (2025-06-23)
+
+
+### Features
+
+* add initial Monzo authentication status display in UI ([4b489d2](https://github.com/rjlee/actual-monzo-pots/commit/4b489d2502d944bdac55f56450db0badaceafce8))
+* enhance error handling and improve UI feedback for Monzo authentication and sync processes ([c194e20](https://github.com/rjlee/actual-monzo-pots/commit/c194e209ed8414b3902838fa8ffc9848a58ff198))
+
 ## [1.3.1](https://github.com/rjlee/actual-monzo-pots/compare/v1.3.0...v1.3.1) (2025-06-22)
 
 
