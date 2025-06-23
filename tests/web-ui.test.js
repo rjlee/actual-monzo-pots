@@ -48,6 +48,10 @@ describe('GET /api/data', () => {
     api.getAccounts.mockResolvedValue([{ id: 'a1', name: 'Actual Account' }]);
     // Stub pot-sync endpoint
     sync.runSync.mockResolvedValue(3);
+    // Disable UI authentication for core Web UI tests
+    process.env.UI_AUTH_ENABLED = 'false';
+    // Disable UI authentication for these tests
+    process.env.UI_AUTH_ENABLED = 'false';
     server = await startWebUi(0, false);
   });
   afterAll(() => {

@@ -3,6 +3,7 @@ const express = require('express');
 const logger = require('./logger');
 const fs = require('fs');
 const https = require('https');
+// Simple session cookie parsing without external deps
 const config = require('./config');
 const { setupMonzo, openBudget } = require('./utils');
 const monzo = require('./monzo-client');
@@ -256,6 +257,16 @@ async function startWebUi(httpPort, verbose) {
       refreshError = err.message;
     }
   }
+  // Validate that no deprecated Basic Auth settings are present (env or config)
+  const deprecatedUser = process.env.UI_USER || config.UI_USER;
+  const deprecatedPass = process.env.UI_PASSWORD || config.UI_PASSWORD;
+  if (deprecatedUser || deprecatedPass) {
+    console.error(
+      'Error: UI_USER/UI_PASSWORD authentication has been removed.\n' +
+        'Please configure session-based auth via ACTUAL_PASSWORD (see README).'
+    );
+    process.exit(1);
+  }
   // Kick off budget download in background; UI will poll for readiness
   let budgetReady = false;
   // Kick off budget download in background; wrap in Promise.resolve to catch sync throws
@@ -283,23 +294,46 @@ async function startWebUi(httpPort, verbose) {
     return server;
   }
 
-  // Optional HTTP Basic Auth for Web UI (protects all routes)
-  const UI_USER = process.env.UI_USER || 'admin';
-  const UI_PASSWORD = process.env.UI_PASSWORD;
-  if (UI_PASSWORD) {
+  // Session-based UI authentication (uses ACTUAL_PASSWORD); simple cookie approach
+  const UI_AUTH_ENABLED = process.env.UI_AUTH_ENABLED !== 'false';
+  const LOGIN_PATH = '/login';
+  const COOKIE_NAME = 'ui-auth';
+  if (UI_AUTH_ENABLED) {
+    const SECRET = process.env.ACTUAL_PASSWORD;
+    if (!SECRET) {
+      logger.error('ACTUAL_PASSWORD must be set to enable UI authentication');
+      process.exit(1);
+    }
+    app.use(express.urlencoded({ extended: false }));
+
+    const loginForm = (error) =>
+      `<!DOCTYPE html>
+<html><body>
+  <h1>Login</h1>
+  ${error ? `<p style="color:red">${error}</p>` : ''}
+  <form method="post" action="${LOGIN_PATH}">
+    <input type="password" name="password" placeholder="Password" autofocus />
+    <button>Log in</button>
+  </form>
+</body></html>`;
+
+    app.post(LOGIN_PATH, (req, res) => {
+      if (req.body.password === SECRET) {
+        res.setHeader('Set-Cookie', `${COOKIE_NAME}=1; HttpOnly; Path=/`);
+        return res.redirect(req.query.next || '/');
+      }
+      return res.status(401).send(loginForm('Invalid password'));
+    });
+
     app.use((req, res, next) => {
-      const auth = req.headers.authorization || '';
-      const [scheme, credentials] = auth.split(' ');
-      if (scheme !== 'Basic' || !credentials) {
-        res.set('WWW-Authenticate', 'Basic realm="actual-monzo-pots UI"');
-        return res.status(401).send('Authentication required.');
+      // Check for our session cookie
+      const header = req.headers.cookie || '';
+      const cookies = header.split(';').map((c) => c.trim());
+      if (cookies.includes(`${COOKIE_NAME}=1`)) {
+        return next();
       }
-      const [user, pass] = Buffer.from(credentials, 'base64').toString().split(':');
-      if (user !== UI_USER || pass !== UI_PASSWORD) {
-        res.set('WWW-Authenticate', 'Basic realm="actual-monzo-pots UI"');
-        return res.status(401).send('Invalid credentials.');
-      }
-      next();
+      if (req.path === LOGIN_PATH) return next();
+      return res.send(loginForm());
     });
   }
 

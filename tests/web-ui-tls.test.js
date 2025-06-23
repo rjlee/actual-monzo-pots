@@ -37,6 +37,8 @@ describe('Web UI TLS support', () => {
   it('serves over HTTPS when SSL_KEY and SSL_CERT are set', async () => {
     process.env.SSL_KEY = '/fake/key.pem';
     process.env.SSL_CERT = '/fake/cert.pem';
+    // Disable UI authentication for TLS tests
+    process.env.UI_AUTH_ENABLED = 'false';
     server = await startWebUi(0, false);
     expect(createServerSpy).toHaveBeenCalledWith(
       { key: Buffer.from('/fake/key.pem'), cert: Buffer.from('/fake/cert.pem') },

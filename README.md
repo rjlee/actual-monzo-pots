@@ -63,13 +63,20 @@ npm run daemon -- --ui [--verbose]
 
 > **Web UI security:** The Web UI displays your Monzo pots and Actual Budget account details in your browser.
 
-- **Password protection:** set `UI_USER` and `UI_PASSWORD` in your `.env` or `config.yaml`:
+- **Session-based UI authentication:** configure with your `ACTUAL_PASSWORD` (Basic Auth via `UI_USER`/`UI_PASSWORD` is no longer supported):
 
-  ```bash
-  UI_USER=admin          # Basic‑Auth user (default: admin)
-  UI_PASSWORD=yourSecret # password to access the UI
+```bash
+  UI_USER=admin                  # deprecated; remove this setting
+  UI_PASSWORD=yourSecret         # deprecated; remove this setting
+  ACTUAL_PASSWORD=yourBudgetPass # require for session-based login
+  UI_AUTH_ENABLED=true           # enable session-based UI auth (default: true)
+```
 
-  ```
+```bash
+UI_USER=admin          # Basic‑Auth user (default: admin)
+UI_PASSWORD=yourSecret # password to access the UI
+
+```
 
 - **Monzo refresh token storage:** the Monzo refresh token is persisted unencrypted to the path defined by
   `TOKEN_DIRECTORY` and `TOKEN_FILE` (default `./data/monzo_refresh_token.txt`). Protect this directory
