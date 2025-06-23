@@ -43,12 +43,21 @@ describe('runSync', () => {
     api.getAccounts.mockResolvedValue([{ id: 'a1' }]);
     api.getAccountBalance.mockResolvedValue(50);
     api.addTransactions.mockResolvedValue();
+    // Stub payee lookup/creation
+    api.getPayees.mockResolvedValue([]);
+    api.createPayee.mockResolvedValue('pid1');
 
     const count = await runSync({ useLogger: false });
     expect(count).toBe(1);
     expect(api.addTransactions).toHaveBeenCalledWith(
       'a1',
-      [expect.objectContaining({ amount: 150, imported_payee: 'actual-monzo-pots' })],
+      [
+        expect.objectContaining({
+          amount: 150,
+          payee: 'pid1',
+          imported_payee: 'actual-monzo-pots',
+        }),
+      ],
       { runTransfers: false, learnCategories: false }
     );
     // mapping.json updated to new balance

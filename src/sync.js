@@ -90,14 +90,33 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
         continue;
       }
       log.info({ pot: pot.name, delta }, 'Syncing pot change');
-      // Import transaction to Actual Budget via addTransactions, setting imported_payee
+      // Create or find a payee for our imported transactions, then import
+      const PAYEE_NAME = 'actual-monzo-pots';
+      let payees = [];
+      try {
+        payees = await api.getPayees();
+      } catch {
+        /* ignore errors fetching payees */
+      }
+      let payeeId = payees.find((p) => p.name === PAYEE_NAME)?.id;
+      if (!payeeId) {
+        try {
+          payeeId = await api.createPayee({ name: PAYEE_NAME });
+        } catch (err) {
+          log.warn({ err, PAYEE_NAME }, 'Failed to create payee; using raw name');
+        }
+      }
       const tx = {
         id: `${pot.id}-${Date.now()}`,
         date: new Date(),
         amount: delta,
-        imported_payee: 'actual-monzo-pots',
+        payee: payeeId || PAYEE_NAME,
+        imported_payee: PAYEE_NAME,
       };
-      await api.addTransactions(acctId, [tx], { runTransfers: false, learnCategories: false });
+      await api.addTransactions(acctId, [tx], {
+        runTransfers: false,
+        learnCategories: false,
+      });
       entry.lastBalance = current;
       applied++;
     }
