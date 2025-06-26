@@ -137,6 +137,13 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
       log.error({ err, mappingPath }, 'Failed to save mapping file atomically');
     }
     log.info({ applied }, 'Completed pot sync');
+    try {
+      log.info('Syncing budget after pot sync');
+      await api.sync();
+      log.info('Budget sync complete');
+    } catch (err) {
+      log.warn({ err }, 'Budget sync after pot sync failed');
+    }
   } catch (err) {
     log.error({ err }, 'Error during sync');
   } finally {
