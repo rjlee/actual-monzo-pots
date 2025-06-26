@@ -47,6 +47,13 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
     return 0;
   }
 
+  try {
+    log.info('Syncing budget before operations');
+    await api.sync();
+  } catch {
+    /* ignore sync errors */
+  }
+
   let applied = 0;
   try {
     // Fetch available Actual accounts

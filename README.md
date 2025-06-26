@@ -20,7 +20,7 @@ _Before you begin, please review the [Security Considerations](#security-conside
    - Set Confidentiality to "Confidential".
      After submission, note the Client ID and Client Secret values, then set `REDIRECT_URI` to your callback URL (e.g. `http://localhost:3000/auth/callback`).
 2. Copy `.env.example` to `.env` and fill in your Monzo credentials (`CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`,
-   `MONZO_SCOPES`) and your Actual Budget settings (`ACTUAL_SERVER_URL`, `ACTUAL_BUDGET_ID`,
+   `MONZO_SCOPES`) and your Actual Budget settings (`ACTUAL_SERVER_URL`, `ACTUAL_SYNC_ID`,
    `ACTUAL_BUDGET_ENCRYPTION_PASSWORD` if your budget file is encrypted).
 
 Session-based UI authentication is enabled by default. A signed session cookie is used (`cookie-session` with a shared secret).

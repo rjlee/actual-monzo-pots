@@ -1,6 +1,5 @@
 require('dotenv').config();
 const fs = require('fs');
-const path = require('path');
 const api = require('@actual-app/api');
 const monzo = require('./monzo-client');
 const logger = require('./logger');
@@ -10,40 +9,46 @@ async function setupMonzo() {
   await monzo.init();
 }
 
+let hasDownloadedBudget = false;
+
 async function openBudget() {
   const url = process.env.ACTUAL_SERVER_URL;
   const password = process.env.ACTUAL_PASSWORD;
-  const budgetId = process.env.ACTUAL_BUDGET_ID;
-  if (!url || !password || !budgetId) {
+  const syncId = process.env.ACTUAL_SYNC_ID;
+  if (!url || !password || !syncId) {
     throw new Error(
-      'Please set ACTUAL_SERVER_URL, ACTUAL_PASSWORD, and ACTUAL_BUDGET_ID environment variables'
+      'Please set ACTUAL_SERVER_URL, ACTUAL_PASSWORD, and ACTUAL_SYNC_ID environment variables'
     );
   }
   const dataDir = process.env.BUDGET_CACHE_DIR || './budget';
 
-  // Clean up old budget cache entries, preserving .gitkeep
-  if (fs.existsSync(dataDir)) {
-    for (const entry of fs.readdirSync(dataDir)) {
-      if (entry === '.gitkeep') continue;
-      try {
-        fs.rmSync(path.join(dataDir, entry), { recursive: true, force: true });
-      } catch {
-        /* ignore cleanup errors */
-      }
-    }
-  } else {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
+  fs.mkdirSync(dataDir, { recursive: true });
 
   logger.info('Connecting to Actual API...');
   await api.init({ dataDir, serverURL: url, password });
 
-  logger.info('Downloading budget (no backup)...');
   const opts = {};
   const budgetPassword = process.env.ACTUAL_BUDGET_ENCRYPTION_PASSWORD;
   if (budgetPassword) opts.password = budgetPassword;
-  await api.downloadBudget(process.env.ACTUAL_BUDGET_ID, opts);
-  logger.info('Budget downloaded');
+
+  if (!hasDownloadedBudget) {
+    logger.info('Downloading budget (no backup)...');
+    try {
+      await api.downloadBudget(syncId, opts);
+      logger.info('Budget downloaded');
+    } catch (err) {
+      logger.warn({ err }, 'Failed to download budget');
+    }
+    hasDownloadedBudget = true;
+  }
+
+  logger.info('Syncing budget changes...');
+  try {
+    await api.sync();
+    logger.info('Budget synced');
+  } catch (err) {
+    logger.warn({ err }, 'Failed to sync budget');
+  }
 }
 
 async function closeBudget() {

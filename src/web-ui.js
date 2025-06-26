@@ -122,6 +122,10 @@ async function startWebUi(httpPort, verbose) {
     });
 
     app.use((req, res, next) => {
+      // Allow OAuth endpoints through without prior UI login
+      if (req.path === '/auth' || req.path === '/auth/callback') {
+        return next();
+      }
       if (req.session.authenticated) {
         return next();
       }
@@ -195,6 +199,12 @@ async function startWebUi(httpPort, verbose) {
         pots = pots.filter((p) => !p.deleted);
       } catch (err) {
         logger.error({ err }, 'Failed to fetch Monzo accounts or pots');
+      }
+
+      try {
+        await api.sync();
+      } catch (err) {
+        logger.error({ err }, 'Failed to sync budget');
       }
 
       // Fetch Actual Budget accounts; fallback to empty on error
