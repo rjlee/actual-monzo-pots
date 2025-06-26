@@ -63,4 +63,11 @@ async function closeBudget() {
   }
 }
 
-module.exports = { setupMonzo, openBudget, closeBudget };
+/**
+ * (Test helper) Reset the internal download flag so openBudget will re-fetch.
+ */
+function __resetBudgetDownloadFlag() {
+  hasDownloadedBudget = false;
+}
+
+module.exports = { setupMonzo, openBudget, closeBudget, __resetBudgetDownloadFlag };

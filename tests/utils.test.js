@@ -36,6 +36,8 @@ describe('openBudget', () => {
     delete process.env.ACTUAL_SYNC_ID;
     delete process.env.BUDGET_CACHE_DIR;
     jest.resetAllMocks();
+    // Reset download flag so each test triggers downloadBudget
+    require('../src/utils').__resetBudgetDownloadFlag();
     if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true, force: true });
   });
 
