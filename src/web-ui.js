@@ -168,7 +168,17 @@ async function startWebUi(httpPort, verbose) {
     })
   );
 
-  app.get('/', (_req, res) => res.send(uiPageHtml(hadRefreshToken, refreshError, UI_AUTH_ENABLED)));
+  app.get(
+    '/',
+    asyncHandler(async (_req, res) => {
+      try {
+        await openBudget();
+      } catch (err) {
+        logger.error({ err }, 'Budget download/sync on page load failed');
+      }
+      res.send(uiPageHtml(hadRefreshToken, refreshError, UI_AUTH_ENABLED));
+    })
+  );
 
   app.get(
     '/api/data',
