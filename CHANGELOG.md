@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.14.0...v1.15.0) (2025-06-26)
+
+
+### Features
+
+* enhance root route to handle budget download on page load with error logging ([d56a939](https://github.com/rjlee/actual-monzo-pots/commit/d56a9398b35b9ee9213adea09b013d2a46d52ac9))
+
 # [1.14.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.13.0...v1.14.0) (2025-06-26)
 
 
