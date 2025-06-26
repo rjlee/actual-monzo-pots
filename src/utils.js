@@ -36,10 +36,10 @@ async function openBudget() {
     try {
       await api.downloadBudget(syncId, opts);
       logger.info('Budget downloaded');
+      hasDownloadedBudget = true;
     } catch (err) {
       logger.warn({ err }, 'Failed to download budget');
     }
-    hasDownloadedBudget = true;
   }
 
   logger.info('Syncing budget changes...');
