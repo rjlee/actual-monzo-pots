@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.15.0...v1.16.0) (2025-06-26)
+
+
+### Features
+
+* add budget sync after pot sync with error handling ([516e230](https://github.com/rjlee/actual-monzo-pots/commit/516e230ab204890e3d152c4398f17ef9887842f1))
+
 # [1.15.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.14.0...v1.15.0) (2025-06-26)
 
 
