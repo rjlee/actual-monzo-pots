@@ -52,6 +52,8 @@ async function openBudget() {
 }
 
 async function closeBudget() {
+  // Reset flag so reopen re-downloads budget/prefs
+  hasDownloadedBudget = false;
   try {
     await api.shutdown();
     if (typeof api.resetBudgetCache === 'function') {
