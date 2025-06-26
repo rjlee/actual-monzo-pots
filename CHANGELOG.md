@@ -1,3 +1,10 @@
+## [1.16.2](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.1...v1.16.2) (2025-06-26)
+
+
+### Bug Fixes
+
+* reset budget download flag in closeBudget function ([0b4f5d9](https://github.com/rjlee/actual-monzo-pots/commit/0b4f5d91729e2a4d50fcf942496733b0ba63fbf0))
+
 ## [1.16.1](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.0...v1.16.1) (2025-06-26)
 
 
