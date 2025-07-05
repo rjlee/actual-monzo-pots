@@ -18,8 +18,9 @@ async function runSync({ verbose = false, useLogger = false } = {}) {
       ? logger
       : { info: () => {}, debug: () => {}, warn: () => {}, error: () => {} };
   const cwd = process.cwd();
-  const mappingFile = process.env.MAPPING_FILE || config.MAPPING_FILE || './data/mapping.json';
-  const mappingPath = path.isAbsolute(mappingFile) ? mappingFile : path.join(cwd, mappingFile);
+  const dataDir = process.env.DATA_DIR || config.DATA_DIR || './data';
+  const absDataDir = path.isAbsolute(dataDir) ? dataDir : path.join(cwd, dataDir);
+  const mappingPath = path.join(absDataDir, 'mapping.json');
 
   // Load or initialize mapping entries
   let mapping = [];

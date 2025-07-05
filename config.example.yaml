@@ -11,5 +11,8 @@ DISABLE_CRON_SCHEDULING: false
 # Port for web UI server (daemon mode only)
 HTTP_PORT: 3000
 
-# Path to JSON file to store pot-account mappings
-MAPPING_FILE: './data/mapping.json'
+# Base directory for data storage (mapping file)
+DATA_DIR: './data'
+
+# Directory for downloaded Actual Budget files
+BUDGET_DIR: './data/budget'

@@ -149,7 +149,9 @@ async function startWebUi(httpPort, verbose) {
     logger.info(meta, 'HTTP request');
     next();
   });
-  const mappingFile = process.env.MAPPING_FILE || config.MAPPING_FILE || './mapping.json';
+  const dataDir = process.env.DATA_DIR || config.DATA_DIR || './data';
+  const absDataDir = path.isAbsolute(dataDir) ? dataDir : path.join(process.cwd(), dataDir);
+  const mappingFile = path.join(absDataDir, 'mapping.json');
 
   // OAuth endpoints for Monzo
   app.get('/auth', (_req, res) => monzo.authorize(res));

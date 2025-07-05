@@ -21,7 +21,7 @@ describe('GET /api/data', () => {
     utils.openBudget.mockResolvedValue();
     // Use a temporary mapping file outside project tree
     const mappingDir = fs.mkdtempSync(path.join(os.tmpdir(), 'mapping-'));
-    process.env.MAPPING_FILE = path.join(mappingDir, 'mapping.json');
+    process.env.DATA_DIR = mappingDir;
     // Stub Monzo authentication and API responses
     monzo.isAuthenticated.mockReturnValue(true);
     monzo.listAccounts.mockResolvedValue([
@@ -58,7 +58,7 @@ describe('GET /api/data', () => {
     server.close();
     // cleanup test mapping directory
     try {
-      fs.rmSync(path.dirname(process.env.MAPPING_FILE), { recursive: true, force: true });
+      fs.rmSync(process.env.DATA_DIR, { recursive: true, force: true });
     } catch (err) {
       /* ignore cleanup errors */
     }

@@ -17,12 +17,12 @@ describe('runSync', () => {
   const mappingFile = path.join(__dirname, 'mapping.json');
 
   beforeEach(() => {
-    process.env.MAPPING_FILE = mappingFile;
+    process.env.DATA_DIR = path.dirname(mappingFile);
     jest.resetAllMocks();
   });
 
   afterEach(() => {
-    delete process.env.MAPPING_FILE;
+    delete process.env.DATA_DIR;
     try {
       fs.unlinkSync(mappingFile);
     } catch (_) {

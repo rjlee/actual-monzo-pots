@@ -34,7 +34,7 @@ describe('openBudget', () => {
     delete process.env.ACTUAL_SERVER_URL;
     delete process.env.ACTUAL_PASSWORD;
     delete process.env.ACTUAL_SYNC_ID;
-    delete process.env.BUDGET_CACHE_DIR;
+    delete process.env.BUDGET_DIR;
     jest.resetAllMocks();
     // Reset download flag so each test triggers downloadBudget
     require('../src/utils').__resetBudgetDownloadFlag();
@@ -46,7 +46,7 @@ describe('openBudget', () => {
     delete process.env.ACTUAL_SERVER_URL;
     delete process.env.ACTUAL_PASSWORD;
     delete process.env.ACTUAL_SYNC_ID;
-    delete process.env.BUDGET_CACHE_DIR;
+    delete process.env.BUDGET_DIR;
     if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true, force: true });
   });
 
@@ -56,11 +56,11 @@ describe('openBudget', () => {
     );
   });
 
-  it('initializes budget and downloads via runImport', async () => {
+  it('initializes budget and downloads via direct downloadBudget', async () => {
     process.env.ACTUAL_SERVER_URL = 'http://example.com';
     process.env.ACTUAL_PASSWORD = 'pw';
     process.env.ACTUAL_SYNC_ID = 'budget1';
-    process.env.BUDGET_CACHE_DIR = testDir;
+    process.env.BUDGET_DIR = testDir;
 
     api.init.mockResolvedValue();
     api.runImport.mockImplementation(async (_name, fn) => {
@@ -84,7 +84,7 @@ describe('openBudget', () => {
     process.env.ACTUAL_SERVER_URL = 'http://example.com';
     process.env.ACTUAL_PASSWORD = 'pw';
     process.env.ACTUAL_SYNC_ID = 'budget1';
-    process.env.BUDGET_CACHE_DIR = testDir;
+    process.env.BUDGET_DIR = testDir;
 
     api.init.mockResolvedValue();
     api.runImport.mockRejectedValue(new Error('fail'));

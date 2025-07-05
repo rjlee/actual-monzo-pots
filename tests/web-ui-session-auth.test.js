@@ -26,7 +26,7 @@ describe('Web UI session-based authentication', () => {
     api.getAccounts.mockResolvedValue([]);
     sync.runSync.mockResolvedValue(0);
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mapping-'));
-    process.env.MAPPING_FILE = path.join(tmp, 'mapping.json');
+    process.env.DATA_DIR = tmp;
     process.env.ACTUAL_PASSWORD = 'secret';
     delete process.env.UI_AUTH_ENABLED; // default on
     server = await startWebUi(0, false);

@@ -3,6 +3,8 @@ const fs = require('fs');
 const api = require('@actual-app/api');
 const monzo = require('./monzo-client');
 const logger = require('./logger');
+const path = require('path');
+const config = require('./config');
 
 async function setupMonzo() {
   logger.info('Initializing Monzo client...');
@@ -20,12 +22,13 @@ async function openBudget() {
       'Please set ACTUAL_SERVER_URL, ACTUAL_PASSWORD, and ACTUAL_SYNC_ID environment variables'
     );
   }
-  const dataDir = process.env.BUDGET_CACHE_DIR || './budget';
+  const budgetDir = process.env.BUDGET_DIR || config.BUDGET_DIR || './data/budget';
+  const absBudgetDir = path.isAbsolute(budgetDir) ? budgetDir : path.join(process.cwd(), budgetDir);
 
-  fs.mkdirSync(dataDir, { recursive: true });
+  fs.mkdirSync(absBudgetDir, { recursive: true });
 
   logger.info('Connecting to Actual API...');
-  await api.init({ dataDir, serverURL: url, password });
+  await api.init({ dataDir: absBudgetDir, serverURL: url, password });
 
   const opts = {};
   const budgetPassword = process.env.ACTUAL_BUDGET_ENCRYPTION_PASSWORD;

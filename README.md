@@ -22,6 +22,8 @@ _Before you begin, please review the [Security Considerations](#security-conside
 2. Copy `.env.example` to `.env` and fill in your Monzo credentials (`CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`,
    `MONZO_SCOPES`) and your Actual Budget settings (`ACTUAL_SERVER_URL`, `ACTUAL_SYNC_ID`,
    `ACTUAL_BUDGET_ENCRYPTION_PASSWORD` if your budget file is encrypted).
+   Optionally, set `DATA_DIR` and `BUDGET_DIR` to control where mappings and budget files are stored
+   (defaults to `data/` and `data/budget/`).
 
 Session-based UI authentication is enabled by default. A signed session cookie is used (`cookie-session` with a shared secret).
 The signing key comes from `SESSION_SECRET` (falling back to `ACTUAL_PASSWORD` if unset).
@@ -42,7 +44,7 @@ SSL_CERT=/path/to/fullchain.pem # path to SSL certificate chain
 
 ````
 
-3. Copy `config.example.yaml` to `config.yaml` if you need to override defaults (schedule, HTTP_PORT, MAPPING_FILE).
+3. Copy `config.example.yaml` to `config.yaml` if you need to override defaults (schedule, HTTP_PORT, DATA_DIR, BUDGET_DIR).
 4. Build and run with Docker Compose:
 
 ```bash

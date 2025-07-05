@@ -25,7 +25,7 @@ describe('Web UI token refresh and budget download behavior', () => {
     tokenDir = fs.mkdtempSync(path.join(os.tmpdir(), 'monzo-'));
   });
   beforeEach(() => {
-    process.env.MAPPING_FILE = path.join(mappingDir, 'mapping.json');
+    process.env.DATA_DIR = mappingDir;
     process.env.UI_AUTH_ENABLED = 'false';
     monzo.tokenDir = tokenDir;
     monzo.tokenFile = 'refresh.txt';
