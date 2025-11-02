@@ -7,16 +7,20 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends python3 build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+# Disable git hooks during image build
+ENV HUSKY=0
+
 # Install JS dependencies (production only); allow overriding @actual-app/api
 ARG ACTUAL_API_VERSION
 ARG GIT_SHA
 ARG APP_VERSION
 COPY package*.json ./
-RUN if [ -n "$ACTUAL_API_VERSION" ]; then \
+RUN npm pkg delete scripts.prepare || true && \
+    if [ -n "$ACTUAL_API_VERSION" ]; then \
       npm pkg set dependencies.@actual-app/api=$ACTUAL_API_VERSION && \
       npm install --package-lock-only; \
     fi && \
-    npm ci --omit=dev
+    npm install --omit=dev
 
 # Copy application source
 COPY . .
