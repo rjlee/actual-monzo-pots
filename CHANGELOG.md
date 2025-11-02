@@ -1,3 +1,10 @@
+## [1.16.6](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.5...v1.16.6) (2025-11-02)
+
+
+### Bug Fixes
+
+* support actual api version specification in docker compose file ([9375750](https://github.com/rjlee/actual-monzo-pots/commit/9375750c8f271d1c30ba38803cadb9dd4b0f8323))
+
 ## [1.16.5](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.4...v1.16.5) (2025-11-02)
 
 
