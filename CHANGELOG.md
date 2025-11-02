@@ -1,3 +1,10 @@
+## [1.16.5](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.4...v1.16.5) (2025-11-02)
+
+
+### Bug Fixes
+
+* fix broken build ([c1248ff](https://github.com/rjlee/actual-monzo-pots/commit/c1248ffd0fcadfdab1c5fd9a9e1f6cd700926e67))
+
 ## [1.16.4](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.3...v1.16.4) (2025-11-02)
 
 
