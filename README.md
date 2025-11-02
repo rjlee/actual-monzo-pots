@@ -109,6 +109,47 @@ We use GitHub Actions + semantic-release to automate version bumps, changelogs, 
 
 Ensure your repository has the `GITHUB_TOKEN` secret (automatically injected) so that Semantic Release and Docker publishing can push back to GitHub.
 
+## Docker
+
+- Pull latest image: `docker pull ghcr.io/rjlee/actual-monzo-pots:latest`
+- Run with env file:
+  - `docker run --rm --env-file .env ghcr.io/rjlee/actual-monzo-pots:latest`
+- Persist data by mounting `./data` to `/app/data`
+- Or via compose: `docker-compose up -d`
+
+## API-Versioned Images
+
+Actual Budget's server and `@actual-app/api` should be compatible. This project publishes API‑specific images so you can pick an image that matches your server:
+
+- Exact pin: `ghcr.io/rjlee/actual-monzo-pots:api-25.2.1`
+- Minor alias: `ghcr.io/rjlee/actual-monzo-pots:api-25.2`
+- Major alias: `ghcr.io/rjlee/actual-monzo-pots:api-25`
+
+The Dockerfile accepts a build arg `ACTUAL_API_VERSION` and CI publishes images for the latest patch of the last two API majors (stable only, no nightly/rc/edge). Each build also publishes rolling aliases for the minor and major lines. Images include labels:
+
+- `io.actual.api.version` — the `@actual-app/api` version
+- `org.opencontainers.image.revision` — git SHA
+- `org.opencontainers.image.version` — app version
+
+### Examples
+
+- Run with a specific API line: `docker run --rm --env-file .env ghcr.io/rjlee/actual-monzo-pots:api-25`
+- Pin exact API patch: `docker run --rm --env-file .env ghcr.io/rjlee/actual-monzo-pots:api-25.2.1`
+
+## Release Strategy
+
+- **App releases (semantic‑release):**
+  - Tags: `<app-version>`, `<major>.<minor>`, `<major>`, `latest`.
+- **API matrix images (compatibility):**
+  - Scope: latest patch of the last two stable `@actual-app/api` majors.
+  - Tags per image: `api-<patch>`, `api-<minor>`, `api-<major>`.
+
+## Choosing an Image Tag
+
+- **You know your server’s API major (recommended):** use `api-<MAJOR>` (e.g. `api-25`).
+- **You need a specific API patch:** use `api-<MAJOR.MINOR.PATCH>`.
+- **Only care about the app release:** use `<app-version>` or `latest`.
+
 ## GitHub Actions
 
 This project includes workflows for CI, release, and Docker publishing in `.github/workflows`.
