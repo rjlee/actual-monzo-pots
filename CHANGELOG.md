@@ -1,3 +1,10 @@
+## [1.16.4](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.3...v1.16.4) (2025-11-02)
+
+
+### Bug Fixes
+
+* add actual-api version build artifacts ([e84f03d](https://github.com/rjlee/actual-monzo-pots/commit/e84f03d557c41ad5a86c4fda0f9d6940e3749b1f))
+
 ## [1.16.3](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.2...v1.16.3) (2025-11-02)
 
 
