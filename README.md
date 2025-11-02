@@ -150,6 +150,11 @@ The Dockerfile accepts a build arg `ACTUAL_API_VERSION` and CI publishes images 
 - **You need a specific API patch:** use `api-<MAJOR.MINOR.PATCH>`.
 - **Only care about the app release:** use `<app-version>` or `latest`.
 
+### Compose Defaults
+
+- The provided `docker-compose.yml` uses `api-${ACTUAL_API_MAJOR}` by default; set `ACTUAL_API_MAJOR` in your `.env` (e.g. `25`).
+- Alternatively, use `:api-stable` to always follow the newest supported API major automatically.
+
 ## GitHub Actions
 
 This project includes workflows for CI, release, and Docker publishing in `.github/workflows`.

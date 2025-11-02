@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.versions.outputs.matrix }}
+      max_major: ${{ steps.versions.outputs.max_major }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,7 +50,8 @@ jobs:
             const newer = (a,b)=> (a.p[0]-b.p[0]) || (a.p[1]-b.p[1]) || (a.p[2]-b.p[2]) > 0;
             for (const x of filtered) { const cur = byMajor.get(x.major); if (!cur || newer(x,cur)) byMajor.set(x.major,x); }
             const result = Array.from(byMajor.values()).sort((a,b)=> a.p[0]-b.p[0] || a.p[1]-b.p[1] || a.p[2]-b.p[2]).map(x=>x.v);
-            process.stdout.write(`matrix=${JSON.stringify(result)}`);
+            console.log(`matrix=${JSON.stringify(result)}`);
+            console.log(`max_major=${majors[0]}`);
           ' | tee -a $GITHUB_OUTPUT
 
   build:
@@ -85,6 +87,21 @@ jobs:
           echo "minor=${V%.*}" >> $GITHUB_OUTPUT
           echo "major=${V%%.*}" >> $GITHUB_OUTPUT
 
+      - name: Compose tag list (include api-stable on highest major)
+        id: taglist
+        run: |
+          LIST="ghcr.io/${{ github.repository }}:api-${{ matrix.ver }}"
+          LIST="$LIST"$'\n'"ghcr.io/${{ github.repository }}:api-${{ steps.aliases.outputs.minor }}"
+          LIST="$LIST"$'\n'"ghcr.io/${{ github.repository }}:api-${{ steps.aliases.outputs.major }}"
+          if [ "${{ steps.aliases.outputs.major }}" = "${{ needs.matrix-build.outputs.max_major }}" ]; then
+            LIST="$LIST"$'\n'"ghcr.io/${{ github.repository }}:api-stable"
+          fi
+          {
+            echo "list<<EOF"
+            echo "$LIST"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Build and push (api matrix)
         uses: docker/build-push-action@v6
         with:
@@ -97,10 +114,7 @@ jobs:
             ACTUAL_API_VERSION=${{ matrix.ver }}
             GIT_SHA=${{ github.sha }}
             APP_VERSION=${{ steps.appver.outputs.version }}
-          tags: |
-            ghcr.io/${{ github.repository }}:api-${{ matrix.ver }}
-            ghcr.io/${{ github.repository }}:api-${{ steps.aliases.outputs.minor }}
-            ghcr.io/${{ github.repository }}:api-${{ steps.aliases.outputs.major }}
+          tags: ${{ steps.taglist.outputs.list }}
 
       - name: Prepare tag manifest
         run: |

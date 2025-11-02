@@ -3,7 +3,7 @@ version: '3.8'
 services:
   actual-monzo-pots:
     # Use the published GHCR image by default; comment out 'image' and uncomment 'build' to rebuild locally
-    image: ghcr.io/rjlee/actual-monzo-pots:latest
+    image: ghcr.io/rjlee/actual-monzo-pots:api-${ACTUAL_API_MAJOR}
     # build: .
     container_name: actual-monzo-pots
     env_file:
