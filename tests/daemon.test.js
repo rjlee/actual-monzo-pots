@@ -41,8 +41,8 @@ describe('scheduleSync', () => {
     const exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {});
     scheduleSync(false);
     expect(logger.error).toHaveBeenCalledWith(
-      { schedule: '0 * * * *' },
-      'Invalid SYNC_CRON schedule: 0 * * * *'
+      { schedule: '45 * * * *' },
+      'Invalid SYNC_CRON schedule: 45 * * * *'
     );
     expect(exitSpy).toHaveBeenCalledWith(1);
     exitSpy.mockRestore();
@@ -52,10 +52,10 @@ describe('scheduleSync', () => {
     cron.validate.mockReturnValue(true);
     scheduleSync(true);
     expect(logger.info).toHaveBeenCalledWith(
-      { job: 'sync', schedule: '0 * * * *', timezone: 'UTC' },
+      { job: 'sync', schedule: '45 * * * *', timezone: 'UTC' },
       'Starting sync daemon'
     );
-    expect(cron.schedule).toHaveBeenCalledWith('0 * * * *', expect.any(Function), {
+    expect(cron.schedule).toHaveBeenCalledWith('45 * * * *', expect.any(Function), {
       timezone: 'UTC',
     });
   });
