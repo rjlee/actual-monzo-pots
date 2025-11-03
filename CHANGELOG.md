@@ -1,3 +1,10 @@
+## [1.16.8](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.7...v1.16.8) (2025-11-03)
+
+
+### Bug Fixes
+
+* add default env vars and defaults ([ef211f7](https://github.com/rjlee/actual-monzo-pots/commit/ef211f751689b43a095ff021f52f5ecf02f23c5b))
+
 ## [1.16.7](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.6...v1.16.7) (2025-11-03)
 
 
