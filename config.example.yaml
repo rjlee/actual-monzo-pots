@@ -16,3 +16,8 @@ DATA_DIR: './data'
 
 # Directory for downloaded Actual Budget files
 BUDGET_DIR: './data/budget'
+
+# Monzo OAuth endpoints (override only if needed)
+MONZO_AUTH_ENDPOINT: 'https://auth.monzo.com'
+MONZO_API_ENDPOINT: 'https://api.monzo.com'
+MONZO_TOKEN_PATH: '/oauth2/token'

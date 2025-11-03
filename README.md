@@ -22,6 +22,8 @@ _Before you begin, please review the [Security Considerations](#security-conside
 2. Copy `.env.example` to `.env` and fill in your Monzo credentials (`CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`,
    `MONZO_SCOPES`) and your Actual Budget settings (`ACTUAL_SERVER_URL`, `ACTUAL_SYNC_ID`,
    `ACTUAL_BUDGET_ENCRYPTION_PASSWORD` if your budget file is encrypted).
+   The app defaults Monzo endpoints if unset: `MONZO_AUTH_ENDPOINT=https://auth.monzo.com`,
+   `MONZO_API_ENDPOINT=https://api.monzo.com`, `MONZO_TOKEN_PATH=/oauth2/token`.
    Optionally, set `DATA_DIR` and `BUDGET_DIR` to control where mappings and budget files are stored
    (defaults to `data/` and `data/budget/`).
 

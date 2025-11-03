@@ -8,11 +8,12 @@ class MonzoClient {
   constructor() {
     this.clientId = process.env.CLIENT_ID;
     this.clientSecret = process.env.CLIENT_SECRET;
-    this.authEndpoint = process.env.MONZO_AUTH_ENDPOINT;
+    // Endpoints and paths; provide safe defaults if envs are not set
+    this.authEndpoint = process.env.MONZO_AUTH_ENDPOINT || 'https://auth.monzo.com';
     // OAuth2 authorization path (relative to auth endpoint), leave blank to use root '/'
     this.authPath = process.env.MONZO_AUTH_PATH || '';
-    this.tokenPath = process.env.MONZO_TOKEN_PATH;
-    this.apiEndpoint = process.env.MONZO_API_ENDPOINT;
+    this.tokenPath = process.env.MONZO_TOKEN_PATH || '/oauth2/token';
+    this.apiEndpoint = process.env.MONZO_API_ENDPOINT || 'https://api.monzo.com';
     this.redirectUri = process.env.REDIRECT_URI;
     this.tokenDir = process.env.TOKEN_DIRECTORY;
     this.tokenFile = process.env.TOKEN_FILE;
@@ -39,6 +40,15 @@ class MonzoClient {
   }
 
   authorize(res) {
+    // Validate required settings early with clear errors
+    if (!this.clientId || !this.redirectUri) {
+      const missing = [];
+      if (!this.clientId) missing.push('CLIENT_ID');
+      if (!this.redirectUri) missing.push('REDIRECT_URI');
+      const msg = `Missing required env: ${missing.join(', ')}. Please set them in your environment.`;
+      logger.error(msg);
+      return res.status(500).send(msg);
+    }
     this.state = uuidv4();
     const params = new URLSearchParams({
       client_id: this.clientId,
