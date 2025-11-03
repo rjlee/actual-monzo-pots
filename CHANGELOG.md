@@ -1,3 +1,10 @@
+## [1.16.7](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.6...v1.16.7) (2025-11-03)
+
+
+### Bug Fixes
+
+* amend cron schedule ([5159ca5](https://github.com/rjlee/actual-monzo-pots/commit/5159ca5a1ad4639f36d7f99a24fd6e43ad0e6811))
+
 ## [1.16.6](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.5...v1.16.6) (2025-11-02)
 
 
