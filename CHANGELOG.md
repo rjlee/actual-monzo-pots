@@ -1,3 +1,10 @@
+## [1.16.10](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.9...v1.16.10) (2025-11-04)
+
+
+### Bug Fixes
+
+* Fix invalid workflow file error ([884df7b](https://github.com/rjlee/actual-monzo-pots/commit/884df7bfade709c3fe4982ee71c02302a95d95d2))
+
 ## [1.16.9](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.8...v1.16.9) (2025-11-04)
 
 
