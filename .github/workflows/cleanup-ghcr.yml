@@ -1,0 +1,17 @@
+name: GHCR Cleanup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * 0' # Sundays 01:00 UTC
+
+jobs:
+  cleanup:
+    uses: rjlee/actual-auto-ci/.github/workflows/cleanup-ghcr.yml@v1
+    with:
+      owner: rjlee
+      package: actual-monzo-pots
+      dry-run: true
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

@@ -7,3 +7,6 @@ CHANGELOG.md
 
 # Ignore EJS templates (server-side rendering)
 **/*.ejs
+
+# Ignore GitHub workflows from Prettier checks
+/.github/workflows/

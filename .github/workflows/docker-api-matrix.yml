@@ -1,120 +1,22 @@
-name: Docker Build API Matrix (last 3 majors)
+name: Docker build
 
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ['CI & Release']
+    workflows: ['Release']
     types: [completed]
   schedule:
-    - cron: '0 6 * * 1' # Weekly refresh
-
-permissions:
-  contents: write
-  packages: write
+    - cron: '0 23 * * *' # Nightly
 
 jobs:
-  matrix-build:
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.versions.outputs.matrix }}
-      max_major: ${{ steps.versions.outputs.max_major }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Compute API versions (last 2 majors, latest patch per major, stable)
-        id: versions
-        run: |
-          ALL=$(npm view @actual-app/api versions --json)
-          export ALL
-          node -e '
-            const all = JSON.parse(process.env.ALL);
-            const stable = all.filter(v => /^\d+\.\d+\.\d+$/.test(v));
-            const parsed = stable.map(v => { const p=v.split(".").map(Number); return { v, p, major:p[0] }; });
-            const majors = Array.from(new Set(parsed.map(x=>x.major))).sort((a,b)=>b-a).slice(0,2);
-            const filtered = parsed.filter(x=>majors.includes(x.major));
-            const byMajor = new Map();
-            const newer = (a,b)=> (a.p[0]-b.p[0]) || (a.p[1]-b.p[1]) || (a.p[2]-b.p[2]) > 0;
-            for (const x of filtered) { const cur = byMajor.get(x.major); if (!cur || newer(x,cur)) byMajor.set(x.major,x); }
-            const result = Array.from(byMajor.values()).sort((a,b)=> a.p[0]-b.p[0] || a.p[1]-b.p[1] || a.p[2]-b.p[2]).map(x=>x.v);
-            console.log(`matrix=${JSON.stringify(result)}`);
-            console.log(`max_major=${majors[0]}`);
-          ' | tee -a $GITHUB_OUTPUT
-
-  build:
-    needs: matrix-build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ver: ${{ fromJson(needs.matrix-build.outputs.matrix) }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Read app version
-        id: appver
-        run: |
-          echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Derive minor/major aliases
-        id: aliases
-        run: |
-          V='${{ matrix.ver }}'
-          echo "minor=${V%.*}" >> $GITHUB_OUTPUT
-          echo "major=${V%%.*}" >> $GITHUB_OUTPUT
-
-      - name: Compose tag list (include api-stable on highest major)
-        id: taglist
-        run: |
-          LIST="ghcr.io/${{ github.repository }}:api-${{ matrix.ver }}"
-          LIST="$LIST"$'\n'"ghcr.io/${{ github.repository }}:api-${{ steps.aliases.outputs.minor }}"
-          LIST="$LIST"$'\n'"ghcr.io/${{ github.repository }}:api-${{ steps.aliases.outputs.major }}"
-          if [ "${{ steps.aliases.outputs.major }}" = "${{ needs.matrix-build.outputs.max_major }}" ]; then
-            LIST="$LIST"$'\n'"ghcr.io/${{ github.repository }}:api-stable"
-          fi
-          {
-            echo "list<<EOF"
-            echo "$LIST"
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Build and push (api matrix)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          platforms: linux/amd64,linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            ACTUAL_API_VERSION=${{ matrix.ver }}
-            GIT_SHA=${{ github.sha }}
-            APP_VERSION=${{ steps.appver.outputs.version }}
-          tags: ${{ steps.taglist.outputs.list }}
+  docker:
+    uses: rjlee/actual-auto-ci/.github/workflows/docker-api-matrix.yml@v1
+    with:
+      image-name: ghcr.io/${{ github.repository }}
+      platforms: linux/amd64
+      majors-window: 3
+      dockerfile: Dockerfile
+      context: .
 
       - name: Prepare tag manifest
         run: |

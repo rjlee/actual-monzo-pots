@@ -1,14 +1,14 @@
-FROM node:20-bullseye-slim AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
-# Install build dependencies for native modules (if any)
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3 build-essential \
+    && apt-get install -y --no-install-recommends python3 make g++ \
     && rm -rf /var/lib/apt/lists/*
 
-# Disable git hooks during image build
 ENV HUSKY=0
+ENV PYTHON=/usr/bin/python3
+ENV npm_config_python=/usr/bin/python3
 
 # Install JS dependencies (production only); allow overriding @actual-app/api
 ARG ACTUAL_API_VERSION
@@ -18,14 +18,14 @@ COPY package*.json ./
 RUN npm pkg delete scripts.prepare || true && \
     if [ -n "$ACTUAL_API_VERSION" ]; then \
       npm pkg set dependencies.@actual-app/api=$ACTUAL_API_VERSION && \
-      npm install --package-lock-only; \
+      npm install --package-lock-only --no-audit --no-fund; \
     fi && \
-    npm install --omit=dev
+    npm ci --omit=dev --no-audit --no-fund
 
 # Copy application source
 COPY . .
 
-FROM node:20-bullseye-slim AS runner
+FROM node:22-slim AS runner
 
 WORKDIR /app
 
