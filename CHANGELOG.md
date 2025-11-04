@@ -1,3 +1,10 @@
+## [1.16.9](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.8...v1.16.9) (2025-11-04)
+
+
+### Bug Fixes
+
+* adopt reusable workflows; gate release on CI; nightly Docker build (amd64); add GHCR cleanup; upgrade Dockerfile to Node 22 with native deps ([c188531](https://github.com/rjlee/actual-monzo-pots/commit/c188531fe5c8315c253222ea09339d94e0f2787b))
+
 ## [1.16.8](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.7...v1.16.8) (2025-11-03)
 
 
