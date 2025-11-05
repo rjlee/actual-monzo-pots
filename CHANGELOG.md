@@ -1,3 +1,10 @@
+## [1.16.13](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.12...v1.16.13) (2025-11-05)
+
+
+### Bug Fixes
+
+* Updating workflow ([d14639c](https://github.com/rjlee/actual-monzo-pots/commit/d14639c1a052b19c7c45cd4ba3c2f6b05de1fec9))
+
 ## [1.16.12](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.11...v1.16.12) (2025-11-05)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "actual-monzo-pots",
-  "version": "1.16.12",
+  "version": "1.16.13",
   "description": "Sync Monzo Pot balances to Actual Budget accounts",
   "main": "src/index.js",
   "scripts": {
