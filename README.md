@@ -127,8 +127,8 @@ Important: choose a tag that matches your Actual server's `@actual-app/api` vers
 
 ## Choosing an Image Tag
 
-- **You know your server’s API major (recommended):** use `api-<MAJOR>` (e.g. `api-25`).
-- **You want to track the newest supported major:** use `latest`.
+- Examples: `ghcr.io/rjlee/actual-monzo-pots:25.11.0` (pinned) or `ghcr.io/rjlee/actual-monzo-pots:latest`.
+- Always pick a semver tag that matches your Actual server’s `@actual-app/api` version, or use `latest` if you want the newest supported version automatically.
 
 ### Compose Defaults
 
