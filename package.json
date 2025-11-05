@@ -17,7 +17,7 @@
     "release": "semantic-release"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "@actual-app/api": "^25.10.0",

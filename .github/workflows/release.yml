@@ -15,5 +15,5 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     uses: rjlee/actual-auto-ci/.github/workflows/release.yml@v1
     with:
-      node-version: '20'
+      node-version: '22'
       package-manager: npm

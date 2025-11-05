@@ -10,9 +10,8 @@ jobs:
   ci:
     uses: rjlee/actual-auto-ci/.github/workflows/ci.yml@v1
     with:
-      node-version: '20'
+      node-version: '22'
       package-manager: npm
       lint: true
       format-check: true
       test: true
-
