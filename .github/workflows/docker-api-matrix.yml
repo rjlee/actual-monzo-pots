@@ -14,6 +14,5 @@ jobs:
     with:
       image-name: ghcr.io/${{ github.repository }}
       platforms: linux/amd64
-      majors-window: 3
       dockerfile: Dockerfile
       context: .
