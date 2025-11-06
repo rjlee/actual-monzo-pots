@@ -5,7 +5,12 @@ const os = require('os');
 
 jest.mock('../src/monzo-client');
 jest.mock('../src/utils');
-jest.mock('../src/logger');
+jest.mock('../src/logger', () => ({
+  error: jest.fn(),
+  warn: jest.fn(),
+  info: jest.fn(),
+  debug: jest.fn(),
+}));
 jest.mock('@actual-app/api');
 jest.mock('../src/sync');
 
