@@ -1,3 +1,10 @@
+## [1.16.14](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.13...v1.16.14) (2025-11-06)
+
+
+### Bug Fixes
+
+* Standardised jest configuration ([b021b67](https://github.com/rjlee/actual-monzo-pots/commit/b021b677e6b92f893db06fc2ff486bb60f2bc061))
+
 ## [1.16.13](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.12...v1.16.13) (2025-11-05)
 
 
