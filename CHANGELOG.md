@@ -1,3 +1,10 @@
+## [1.16.15](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.14...v1.16.15) (2025-11-06)
+
+
+### Bug Fixes
+
+* improved signal heandling and structured logging ([c51bd9d](https://github.com/rjlee/actual-monzo-pots/commit/c51bd9d72e61a9fc4127ff9c169c63b54d6e9a59))
+
 ## [1.16.14](https://github.com/rjlee/actual-monzo-pots/compare/v1.16.13...v1.16.14) (2025-11-06)
 
 
