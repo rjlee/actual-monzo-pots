@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js --mode sync",
     "sync": "node src/index.js --mode sync",
-  "daemon": "node src/index.js --mode daemon",
+    "daemon": "node src/index.js --mode daemon",
     "test": "jest --passWithNoTests",
     "test:coverage": "JEST_COVERAGE=true npm test",
     "test:watch": "jest --watch",
