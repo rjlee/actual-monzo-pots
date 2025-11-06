@@ -3,6 +3,7 @@ require('./suppress');
 require('dotenv').config();
 
 const config = require('./config');
+const logger = require('./logger');
 const { runSync } = require('./sync');
 const { runDaemon } = require('./daemon');
 
@@ -37,8 +38,8 @@ async function main(args = process.argv.slice(2)) {
     .help().argv;
 
   const { mode, ui, httpPort, verbose } = argv;
+  logger.info({ mode }, 'Service starting');
   if (verbose) {
-    const logger = require('./logger');
     logger.level = 'debug';
   }
   switch (mode) {

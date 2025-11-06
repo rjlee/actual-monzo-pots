@@ -1,13 +1,18 @@
 const pino = require('pino');
+const { version } = require('../package.json');
 
-// Create a JSON-structured logger with timestamp
-const logger = pino({
+const baseLogger = pino({
   level: process.env.LOG_LEVEL || 'info',
   timestamp: pino.stdTimeFunctions.isoTime,
 });
 
-// Silence logs during tests to avoid polluting test output
-if (process.env.NODE_ENV === 'test') {
+const logger = baseLogger.child({
+  service: 'actual-monzo-pots',
+  version,
+  environment: process.env.NODE_ENV || 'production',
+});
+
+if (process.env.NODE_ENV === 'test' && !process.env.LOG_LEVEL) {
   logger.level = 'silent';
 }
 
