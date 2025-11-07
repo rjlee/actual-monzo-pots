@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: ['CI']
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    uses: rjlee/actual-auto-ci/.github/workflows/release.yml@v1
+    with:
+      node-version: '22.14.0'
+      package-manager: 'npm'
+    secrets: inherit

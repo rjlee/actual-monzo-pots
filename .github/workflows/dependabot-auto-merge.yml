@@ -1,0 +1,14 @@
+name: Dependabot Auto Merge
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    uses: rjlee/actual-auto-ci/.github/workflows/dependabot-auto-merge.yml@v1
+    secrets: inherit

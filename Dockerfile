@@ -1,4 +1,4 @@
-FROM node:22-slim AS builder
+FROM node:22.14.0-slim AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN npm pkg delete scripts.prepare || true && \
 # Copy application source
 COPY . .
 
-FROM node:22-slim AS runner
+FROM node:22.14.0-slim AS runner
 
 WORKDIR /app
 
