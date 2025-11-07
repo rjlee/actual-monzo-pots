@@ -85,6 +85,13 @@ async function startWebUi(httpPort, verbose) {
   }
 
   const UI_AUTH_ENABLED = process.env.UI_AUTH_ENABLED !== 'false';
+  const LOGIN_PATH = '/login';
+  const loginForm = (error) => {
+    const templatePath = path.join(__dirname, 'views', 'login.ejs');
+    const template = fs.readFileSync(templatePath, 'utf8');
+    return ejs.render(template, { error, LOGIN_PATH }, { filename: templatePath });
+  };
+
   if (UI_AUTH_ENABLED) {
     const SECRET = process.env.ACTUAL_PASSWORD;
     if (!SECRET) {
@@ -103,15 +110,6 @@ async function startWebUi(httpPort, verbose) {
       })
     );
 
-    const LOGIN_PATH = '/login';
-    /* eslint-disable no-inner-declarations */
-    function loginForm(error) {
-      const templatePath = path.join(__dirname, 'views', 'login.ejs');
-      const template = fs.readFileSync(templatePath, 'utf8');
-      return ejs.render(template, { error, LOGIN_PATH }, { filename: templatePath });
-    }
-
-    /* eslint-enable no-inner-declarations */
     app.get(LOGIN_PATH, (_req, res) => res.send(loginForm()));
     app.post(LOGIN_PATH, (req, res) => {
       if (req.body.password === SECRET) {
@@ -193,7 +191,7 @@ async function startWebUi(httpPort, verbose) {
       let mapping = [];
       try {
         mapping = JSON.parse(fs.readFileSync(mappingFile, 'utf8'));
-      } catch (_) {
+      } catch {
         // no mapping file or invalid JSON
       }
 

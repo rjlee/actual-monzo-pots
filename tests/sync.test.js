@@ -25,7 +25,7 @@ describe('runSync', () => {
     delete process.env.DATA_DIR;
     try {
       fs.unlinkSync(mappingFile);
-    } catch (_) {
+    } catch {
       // ignore
     }
   });

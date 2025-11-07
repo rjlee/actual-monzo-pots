@@ -59,7 +59,7 @@ describe('GET /api/data', () => {
     // cleanup test mapping directory
     try {
       fs.rmSync(process.env.DATA_DIR, { recursive: true, force: true });
-    } catch (err) {
+    } catch {
       /* ignore cleanup errors */
     }
   });

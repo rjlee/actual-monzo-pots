@@ -127,15 +127,16 @@ async function loadData(ready = false) {
  * Poll server until budgetReady, then load data
  */
 async function waitForBudgetThenLoad() {
-  /* eslint-disable no-constant-condition */
   const statusEl = document.getElementById('budgetStatus');
-  while (true) {
+  let polling = true;
+  while (polling) {
     try {
       const res = await fetch('/api/budget-status');
       const { ready } = await res.json();
       if (ready) {
         statusEl.textContent = 'Budget downloaded';
         statusEl.className = 'badge bg-success';
+        polling = false;
         break;
       } else {
         statusEl.textContent = 'Budget downloading';
