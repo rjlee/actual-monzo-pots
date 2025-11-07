@@ -163,7 +163,12 @@ async function createWebApp(verbose = false) {
       let mapping = [];
       try {
         mapping = JSON.parse(fs.readFileSync(mappingFile, 'utf8'));
-      } catch {}
+      } catch (err) {
+        logger.warn(
+          { err },
+          'Failed to load mapping cache from disk; continuing with empty mapping'
+        );
+      }
 
       let monoAccounts = [];
       let pots = [];
