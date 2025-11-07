@@ -3,13 +3,14 @@ name: Docker build
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ['Release']
+    workflows: ['CI']
     types: [completed]
   schedule:
-    - cron: '0 23 * * *' # Nightly
+    - cron: '0 23 * * *'
 
 jobs:
   docker:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     uses: rjlee/actual-auto-ci/.github/workflows/docker-api-matrix.yml@v1
     with:
       image-name: ghcr.io/${{ github.repository }}
