@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/rjlee/actual-monzo-pots/compare/v1.0.0...v1.0.1) (2025-11-07)
+
+
+### Bug Fixes
+
+* align monzo pots lint and tests ([f8ecee1](https://github.com/rjlee/actual-monzo-pots/commit/f8ecee190417f0ea0576f1a85cd37832b09fa7d3))
+* log mapping cache load failure ([e2127c0](https://github.com/rjlee/actual-monzo-pots/commit/e2127c0000ab99eaa2e9b37b89cc058fc1a4cf56))
+
 # 1.0.0 (2025-11-07)
 
 
