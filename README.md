@@ -1,19 +1,19 @@
 # actual-monzo-pots
 
-Sync Monzo Pot balances into Actual Budget accounts. Authenticate with Monzo via OAuth, map pots to Actual accounts in the web UI, and run scheduled syncs or manual adjustments.
+Synchronise Monzo Pot balances into Actual Budget accounts. Authenticate via Monzo OAuth, map pots to Actual accounts in the Web UI, and let the daemon keep everything in sync.
 
 ## Features
 
-- OAuth2 flow with secure token storage and session-based UI authentication.
-- Web UI for pot/account mapping and on-demand sync.
-- Cron-driven daemon with configurable schedule.
-- Docker image with health check and persistent data volume.
+- Guided OAuth2 login with secure token storage and session-authenticated UI.
+- Web UI for pot/account mapping, manual sync, and status.
+- Cron-driven daemon with configurable schedule and optional dry-run.
+- Docker image with baked-in health check and persistent data volume.
 
 ## Requirements
 
-- Node.js ≥ 20.
-- Monzo Developer OAuth client (Client ID, Secret, Redirect URI).
-- Actual Budget server connection and credentials.
+- Node.js ≥ 22.
+- Monzo developer OAuth credentials (`CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI`).
+- Actual Budget server credentials (`ACTUAL_SERVER_URL`, `ACTUAL_PASSWORD`, `ACTUAL_SYNC_ID`).
 
 ## Installation
 
@@ -23,7 +23,7 @@ cd actual-monzo-pots
 npm install
 ```
 
-Optional husky hooks:
+Optional git hooks:
 
 ```bash
 npm run prepare
@@ -41,43 +41,41 @@ docker run -d --env-file .env \
   actual-monzo-pots --mode daemon --ui
 ```
 
-Prebuilt images: `ghcr.io/rjlee/actual-monzo-pots:<tag>`.
+Published images live at `ghcr.io/rjlee/actual-monzo-pots:<tag>` (see [Image tags](#image-tags)).
 
 ## Configuration
 
-- `.env` – Actual credentials, Monzo OAuth credentials, session settings, schedule overrides.
-- `config.yaml` / `config.yml` / `config.json` – optional defaults (copy `config.example.yaml`).
+- `.env` – primary configuration, copy from `.env.example`.
+- `config.yaml` / `config.yml` / `config.json` – optional defaults, copy from `config.example.yaml`.
 
-Precedence: CLI > env vars > config file.
+Precedence: CLI flags > environment variables > config file.
 
-Key options:
-
-| Setting                                      | Description                      | Default                                 |
-| -------------------------------------------- | -------------------------------- | --------------------------------------- |
-| `DATA_DIR`                                   | App data (token cache, mappings) | `./data`                                |
-| `BUDGET_DIR`                                 | Budget cache                     | `./data/budget`                         |
-| `SYNC_CRON` / `SYNC_CRON_TIMEZONE`           | Cron schedule                    | `45 * * * *` / `UTC`                    |
-| `DISABLE_CRON_SCHEDULING`                    | Disable cron in daemon           | `false`                                 |
-| `HTTP_PORT`                                  | Web UI port                      | `3000`                                  |
-| `UI_AUTH_ENABLED`                            | Require login                    | `true`                                  |
-| `CLIENT_ID`, `CLIENT_SECRET`, `REDIRECT_URI` | Monzo OAuth credentials          | —                                       |
-| `MONZO_SCOPES`                               | OAuth scopes                     | `pots:read accounts:read` (see example) |
+| Setting                             | Description                                    | Default                              |
+| ----------------------------------- | ---------------------------------------------- | ------------------------------------ |
+| `CLIENT_ID` / `CLIENT_SECRET`       | Monzo OAuth credentials                        | required                             |
+| `REDIRECT_URI`                      | OAuth redirect URI                             | required                             |
+| `MONZO_SCOPES`                      | Space-separated scopes                         | from developer portal                |
+| `DATA_DIR`                          | Local storage for tokens + mappings            | `./data`                             |
+| `TOKEN_DIRECTORY` / `TOKEN_FILE`    | Refresh token location                         | `./data` / `monzo_refresh_token.txt` |
+| `BUDGET_DIR`                        | Budget cache directory                         | `./data/budget`                      |
+| `SYNC_CRON` / `SYNC_CRON_TIMEZONE`  | Daemon cron schedule                           | `45 * * * *` / `UTC`                 |
+| `DISABLE_CRON_SCHEDULING`           | Disable cron while in daemon mode              | `false`                              |
+| `HTTP_PORT`                         | Enables Web UI when set or `--ui` passed       | `3000`                               |
+| `UI_AUTH_ENABLED`, `SESSION_SECRET` | Session-auth toggle and cookie secret          | `true`, fallback to password         |
+| `LOG_LEVEL`                         | Pino log level                                 | `info`                               |
+| `ENABLE_NODE_VERSION_SHIM`          | Legacy shim for older `@actual-app/api` checks | `false`                              |
 
 ## Usage
 
-### Local
+### CLI modes
 
-```bash
-# One-off sync
-npm run sync
+- One-off sync: `npm run sync`
+- Daemon with UI: `npm run daemon -- --ui --http-port 3000`
+- Disable cron in daemon: `DISABLE_CRON_SCHEDULING=true npm run daemon`
 
-# Daemon with UI
-npm run daemon -- --ui --http-port 3000
-```
+Visit `http://localhost:3000` (or your configured port) to connect to Monzo, map pots, and trigger on-demand syncs.
 
-Visit `http://localhost:3000` (or your configured port) to authenticate with Monzo, map pots, and trigger manual syncs.
-
-### Docker
+### Docker daemon
 
 ```bash
 docker run --rm --env-file .env \
@@ -98,14 +96,10 @@ npm run format:check
 
 ## Image tags
 
-- `ghcr.io/rjlee/actual-monzo-pots:<semver>` – pinned Actual API version.
-- `ghcr.io/rjlee/actual-monzo-pots:latest` – highest supported release.
+- `ghcr.io/rjlee/actual-monzo-pots:<semver>` – pinned to a specific `@actual-app/api` release.
+- `ghcr.io/rjlee/actual-monzo-pots:latest` – highest supported API version.
 
-## Security considerations
-
-- OAuth refresh token is stored in `DATA_DIR` (default `./data/monzo_refresh_token.txt`). Protect this directory.
-- UI authentication is on by default; set a unique `SESSION_SECRET`.
-- Serve over HTTPS with `SSL_KEY`/`SSL_CERT`, or disable the UI entirely once configuration is finished.
+See [rjlee/actual-auto-ci](https://github.com/rjlee/actual-auto-ci) for tagging policy and automation details.
 
 ## License
 
