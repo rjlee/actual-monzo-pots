@@ -1,7 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const { writeFile, readFile, mkdir } = require('fs/promises');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const logger = require('./logger');
 
 class MonzoClient {
@@ -49,7 +49,7 @@ class MonzoClient {
       logger.error(msg);
       return res.status(500).send(msg);
     }
-    this.state = uuidv4();
+    this.state = randomUUID();
     const params = new URLSearchParams({
       client_id: this.clientId,
       redirect_uri: this.redirectUri,

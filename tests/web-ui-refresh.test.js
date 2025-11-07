@@ -72,6 +72,7 @@ describe('Web UI token refresh and budget download behavior', () => {
 
   it('logs budget download failures and still reports ready', async () => {
     utils.openBudget.mockRejectedValue(new Error('download error'));
+    utils.setupMonzo.mockResolvedValue();
     server = await startWebUi(0, false);
     await new Promise((r) => setTimeout(r, 0));
     expect(logger.error).toHaveBeenCalledWith({ err: expect.any(Error) }, 'Budget download failed');

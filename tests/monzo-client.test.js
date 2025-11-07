@@ -5,7 +5,9 @@ jest.mock('fs/promises', () => ({
   readFile: jest.fn(),
   mkdir: jest.fn(),
 }));
-jest.mock('uuid', () => ({ v4: jest.fn(() => 'fixed-state') }));
+jest.mock('crypto', () => ({
+  randomUUID: jest.fn(() => 'fixed-state'),
+}));
 
 const axios = require('axios');
 const fs = require('fs/promises');
