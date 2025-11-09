@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/rjlee/actual-monzo-pots/compare/v1.0.1...v1.0.2) (2025-11-09)
+
+
+### Bug Fixes
+
+* fix linting and tests ([dcda4f2](https://github.com/rjlee/actual-monzo-pots/commit/dcda4f2fdb8739c9bcf9e9672d70a4308d1280dd))
+
 ## [1.0.1](https://github.com/rjlee/actual-monzo-pots/compare/v1.0.0...v1.0.1) (2025-11-07)
 
 
