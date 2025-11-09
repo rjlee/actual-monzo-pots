@@ -10,7 +10,7 @@ describe('Web UI 401 redirect logic in index.ejs', () => {
   it('guards auto-redirect with hadRefreshToken check in index.js', () => {
     // Ensure redirect to /auth on 401 is only inside the hadRefreshToken conditional
     const pattern =
-      /if \(res\.status === 401\) \{\s*\/\/ Only auto-redirect to Monzo auth if a refresh token existed[\s\S]*?if \(hadRefreshToken\) \{\s*window\.location\.href = '\/auth';[\s\S]*?\}\s*return;/;
+      /if \(res\.status === 401\) \{\s*\/\/ Only auto-redirect to Monzo auth if a refresh token existed[\s\S]*?if \(hadRefreshToken\) \{\s*window\.location\.href = `\$\{basePath\}\/auth`;[\s\S]*?\}\s*return;/;
     expect(template).toMatch(pattern);
   });
 });
