@@ -8,8 +8,8 @@
   </div>
   <div class="d-flex justify-content-between align-items-center mb-4">
     <a id="authBtn" href="/auth" class="btn btn-secondary">Authenticate Monzo</a>
-    <% if (uiAuthEnabled) { %>
-      <form method="post" action="/logout" class="m-0">
+    <% if (showLogoutButton) { %>
+      <form method="post" action="/auth/logout" class="m-0">
         <button type="submit" class="btn btn-warning">Logout</button>
       </form>
     <% } %>

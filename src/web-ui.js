@@ -5,7 +5,6 @@ const ejs = require('ejs');
 const logger = require('./logger');
 const fs = require('fs');
 const https = require('https');
-const cookieSession = require('cookie-session');
 const config = require('./config');
 const { setupMonzo, openBudget } = require('./utils');
 const monzo = require('./monzo-client');
@@ -14,12 +13,23 @@ const { runSync } = require('./sync');
 
 const asyncHandler = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
-function uiPageHtml(hadRefreshToken, refreshError, uiAuthEnabled) {
+const DEFAULT_COOKIE_NAME = 'actual-auth';
+
+function hasAuthCookie(req) {
+  const cookieName = process.env.AUTH_COOKIE_NAME?.trim() || DEFAULT_COOKIE_NAME;
+  const cookieHeader = req.headers?.cookie || '';
+  return cookieHeader
+    .split(';')
+    .map((part) => part.trim())
+    .some((part) => part.startsWith(`${cookieName}=`));
+}
+
+function uiPageHtml({ hadRefreshToken, refreshError, showLogoutButton }) {
   const templatePath = path.join(__dirname, 'views', 'index.ejs');
   const template = fs.readFileSync(templatePath, 'utf8');
   return ejs.render(
     template,
-    { hadRefreshToken, refreshError, uiAuthEnabled },
+    { hadRefreshToken, refreshError, showLogoutButton },
     { filename: templatePath }
   );
 }
@@ -62,57 +72,6 @@ async function createWebApp(verbose = false) {
   app.use(express.json());
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
-  const UI_AUTH_ENABLED = process.env.UI_AUTH_ENABLED !== 'false';
-  const LOGIN_PATH = '/login';
-  const loginForm = (error) => {
-    const templatePath = path.join(__dirname, 'views', 'login.ejs');
-    const template = fs.readFileSync(templatePath, 'utf8');
-    return ejs.render(template, { error, LOGIN_PATH }, { filename: templatePath });
-  };
-
-  if (UI_AUTH_ENABLED) {
-    const SECRET = process.env.ACTUAL_PASSWORD;
-    if (!SECRET) {
-      logger.error('ACTUAL_PASSWORD must be set to enable UI authentication');
-      process.exit(1);
-    }
-    app.use(express.urlencoded({ extended: false }));
-    app.use(
-      cookieSession({
-        name: 'session',
-        keys: [process.env.SESSION_SECRET || SECRET],
-        maxAge: 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        secure: Boolean(process.env.SSL_KEY && process.env.SSL_CERT),
-        sameSite: 'strict',
-      })
-    );
-
-    app.get(LOGIN_PATH, (_req, res) => res.send(loginForm()));
-    app.post(LOGIN_PATH, (req, res) => {
-      if (req.body.password === SECRET) {
-        req.session.authenticated = true;
-        return res.redirect(req.query.next || '/');
-      }
-      return res.status(401).send(loginForm('Invalid password'));
-    });
-
-    app.use((req, res, next) => {
-      if (req.path === '/auth' || req.path === '/auth/callback') {
-        return next();
-      }
-      if (req.session.authenticated) {
-        return next();
-      }
-      return res.send(loginForm());
-    });
-
-    app.post('/logout', (req, res) => {
-      req.session = null;
-      res.redirect(LOGIN_PATH);
-    });
-  }
-
   app.use((req, res, next) => {
     const meta = { method: req.method, url: req.url };
     if (verbose) {
@@ -144,13 +103,19 @@ async function createWebApp(verbose = false) {
 
   app.get(
     '/',
-    asyncHandler(async (_req, res) => {
+    asyncHandler(async (req, res) => {
       try {
         await openBudget();
       } catch (err) {
         logger.error({ err }, 'Budget download/sync on page load failed');
       }
-      res.send(uiPageHtml(hadRefreshToken, refreshError, UI_AUTH_ENABLED));
+      res.send(
+        uiPageHtml({
+          hadRefreshToken,
+          refreshError,
+          showLogoutButton: hasAuthCookie(req),
+        })
+      );
     })
   );
 
