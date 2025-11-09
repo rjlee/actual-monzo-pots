@@ -1,5 +1,6 @@
 /* eslint-env browser */
 // Global config passed from server-side EJS
+const basePath = window.location.pathname.replace(/\/$/, "");
 const { hadRefreshToken } = window.__UI_CONFIG;
 
 // Check for auth=success or auth=error in the URL
@@ -26,7 +27,7 @@ let mapping = [];
 async function loadData(ready = false) {
   let res;
   try {
-    res = await fetch('/api/data');
+    res = await fetch(`${basePath}/api/data`);
   } catch (err) {
     console.error('Failed to fetch /api/data', err);
     return;
@@ -34,7 +35,7 @@ async function loadData(ready = false) {
   if (res.status === 401) {
     // Only auto-redirect to Monzo auth if a refresh token existed
     if (hadRefreshToken) {
-      window.location.href = '/auth';
+	      window.location.href = `${basePath}/auth`;
     }
     return;
   }
@@ -50,7 +51,7 @@ async function loadData(ready = false) {
   } else {
     authBtn.textContent = 'Authenticate Monzo';
     authBtn.className = 'btn btn-secondary';
-    authBtn.setAttribute('href', '/auth');
+	    authBtn.setAttribute('href', `${basePath}/auth`);
     authBtn.removeAttribute('aria-disabled');
   }
   const retailAccounts = monoAccounts.filter((a) => a.type?.startsWith('uk_retail'));
@@ -131,7 +132,7 @@ async function waitForBudgetThenLoad() {
   let polling = true;
   while (polling) {
     try {
-      const res = await fetch('/api/budget-status');
+	      const res = await fetch(`${basePath}/api/budget-status`);
       const { ready } = await res.json();
       if (ready) {
         statusEl.textContent = 'Budget downloaded';
@@ -165,7 +166,7 @@ document.getElementById('saveBtn').onclick = async () => {
       const existing = mapping.find((m) => m.potId === potId);
       newMap.push({ potId, accountId, lastBalance: existing?.lastBalance || 0 });
     });
-    const res = await fetch('/api/mappings', {
+	    const res = await fetch(`${basePath}/api/mappings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newMap),
@@ -186,7 +187,7 @@ syncBtn.onclick = async () => {
   syncBtn.disabled = true;
   statusEl.textContent = 'Syncing...';
   try {
-    const res = await fetch('/api/sync', { method: 'POST' });
+	    const res = await fetch(`${basePath}/api/sync`, { method: 'POST' });
     const json = await res.json();
     if (!res.ok) {
       throw new Error(json.error || 'Failed to sync');
