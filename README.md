@@ -43,6 +43,15 @@ docker run -d --env-file .env \
 
 Published images live at `ghcr.io/rjlee/actual-monzo-pots:<tag>` (see [Image tags](#image-tags)).
 
+For Compose deployments you can choose between:
+
+- `docker-compose.yml` – publishes the UI directly on `HTTP_PORT`.
+- `docker-compose.with-auth.yml.example` – bundles Traefik plus
+  [`actual-auto-auth`](https://github.com/rjlee/actual-auto-auth) so access is
+  gated by the shared password prompt. Copy it to `docker-compose.yml`, update
+  `AUTH_APP_NAME` / `AUTH_COOKIE_NAME` to taste, and ensure `ACTUAL_PASSWORD`
+  is available to the auth proxy.
+
 ## Configuration
 
 - `.env` – primary configuration, copy from `.env.example`.

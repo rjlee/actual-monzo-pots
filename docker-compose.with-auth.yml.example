@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:2.11
+    container_name: actual-monzo-pots-traefik
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - '${HTTP_PORT:-3000}:80'
+    networks:
+      - monzo
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - actual-monzo-pots
+      - actual-auto-auth
+
+  actual-auto-auth:
+    image: ${AUTH_FORWARD_IMAGE:-ghcr.io/rjlee/actual-auto-auth:latest}
+    pull_policy: always
+    container_name: actual-monzo-pots-auth
+    environment:
+      ACTUAL_PASSWORD: ${ACTUAL_PASSWORD:?ACTUAL_PASSWORD must be set}
+      AUTH_APP_NAME: ${AUTH_APP_NAME:-Actual Monzo Pots}
+      AUTH_COOKIE_NAME: ${AUTH_COOKIE_NAME:-monzo-auth}
+      PORT: 4000
+    networks:
+      - monzo
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monzo-auth.rule=PathPrefix(`/auth`)
+      - traefik.http.routers.monzo-auth.entrypoints=web
+      - traefik.http.routers.monzo-auth.priority=100
+      - traefik.http.services.monzo-auth.loadbalancer.server.port=4000
+      - traefik.http.middlewares.monzo-forward.forwardauth.address=http://actual-monzo-pots-auth:4000/check
+      - traefik.http.middlewares.monzo-forward.forwardauth.trustForwardHeader=true
+      - traefik.http.middlewares.monzo-forward.forwardauth.authResponseHeaders=Set-Cookie
+      - 'traefik.http.middlewares.monzo-forward.forwardauth.authRequestHeaders=X-Actual-App-Name,X-Actual-Cookie-Name,X-Forwarded-Host,X-Forwarded-Proto,Cookie'
+
+  actual-monzo-pots:
+    image: ghcr.io/rjlee/actual-monzo-pots:${ACTUAL_IMAGE_TAG:-latest}
+    container_name: actual-monzo-pots
+    env_file:
+      - .env
+    command: ['--mode', 'daemon', '--ui', '--http-port', '${HTTP_PORT:-3000}']
+    environment:
+      AUTH_COOKIE_NAME: ${AUTH_COOKIE_NAME:-monzo-auth}
+    restart: unless-stopped
+    depends_on:
+      - actual-auto-auth
+    networks:
+      - monzo
+    volumes:
+      - type: bind
+        source: ./data
+        target: /app/data
+      - type: bind
+        source: ./data/budget
+        target: /app/budget
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.monzo.rule=PathPrefix(`/`) && !PathPrefix(`/auth`)
+      - traefik.http.routers.monzo.entrypoints=web
+      - traefik.http.routers.monzo.middlewares=monzo-chain@docker
+      - traefik.http.services.monzo.loadbalancer.server.port=${HTTP_PORT:-3000}
+      - traefik.http.middlewares.monzo-headers.headers.customrequestheaders.X-Actual-App-Name=${AUTH_APP_NAME:-Actual Monzo Pots}
+      - traefik.http.middlewares.monzo-headers.headers.customrequestheaders.X-Actual-Cookie-Name=${AUTH_COOKIE_NAME:-monzo-auth}
+      - traefik.http.middlewares.monzo-chain.chain.middlewares=monzo-headers@docker,monzo-forward@docker
+
+networks:
+  monzo:
+    driver: bridge
