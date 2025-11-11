@@ -1,4 +1,66 @@
 // Tests for CLI entrypoint main in src/index.js
+jest.mock('yargs/yargs', () => {
+  const toCamel = (name) =>
+    name.replace(/-([a-z])/g, (_match, char) => char.toUpperCase());
+
+  return (args = []) => {
+    const parsed = {};
+    const positional = [];
+    for (let i = 0; i < args.length; i += 1) {
+      const token = args[i];
+      if (token.startsWith('--')) {
+        const key = token.slice(2);
+        const next = args[i + 1];
+        if (next && !next.startsWith('--')) {
+          parsed[key] = next;
+          i += 1;
+        } else {
+          parsed[key] = true;
+        }
+      } else {
+        positional.push(token);
+      }
+    }
+    parsed._ = positional;
+
+    const defaults = {};
+    const builder = {
+      option(optionName, options = {}) {
+        if (Object.prototype.hasOwnProperty.call(options, 'default')) {
+          defaults[optionName] = options.default;
+        }
+        return builder;
+      },
+      help() {
+        return builder;
+      },
+    };
+
+    Object.defineProperty(builder, 'argv', {
+      get() {
+        const merged = { ...defaults, ...parsed };
+        const result = {};
+        for (const [key, value] of Object.entries(merged)) {
+          if (key === '_') continue;
+          let finalValue = value;
+          if (typeof finalValue === 'string') {
+            if (finalValue === 'true' || finalValue === 'false') {
+              finalValue = finalValue === 'true';
+            } else if (!Number.isNaN(Number(finalValue))) {
+              finalValue = Number(finalValue);
+            }
+          }
+          result[toCamel(key)] = finalValue;
+        }
+        result._ = merged._ ?? [];
+        return result;
+      },
+    });
+
+    return builder;
+  };
+});
+
 jest.mock('../src/sync', () => ({
   runSync: jest.fn().mockResolvedValue(),
 }));
