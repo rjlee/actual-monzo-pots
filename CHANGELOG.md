@@ -1,3 +1,16 @@
+# [1.1.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.0.2...v1.1.0) (2025-11-11)
+
+
+### Bug Fixes
+
+* fix formatting ([98970f9](https://github.com/rjlee/actual-monzo-pots/commit/98970f907b8c016391944e76148fbc2365a0bf67))
+* fixing test ([1ecd2ef](https://github.com/rjlee/actual-monzo-pots/commit/1ecd2ef288b869525ae53a25e3584dfbe3192520))
+
+
+### Features
+
+* add auth-enabled compose sample ([bcdd73b](https://github.com/rjlee/actual-monzo-pots/commit/bcdd73bf4838aa3b30dcf1f36826d85b8a4c4ccf))
+
 ## [1.0.2](https://github.com/rjlee/actual-monzo-pots/compare/v1.0.1...v1.0.2) (2025-11-09)
 
 
