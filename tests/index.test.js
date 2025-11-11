@@ -1,7 +1,6 @@
 // Tests for CLI entrypoint main in src/index.js
 jest.mock('yargs/yargs', () => {
-  const toCamel = (name) =>
-    name.replace(/-([a-z])/g, (_match, char) => char.toUpperCase());
+  const toCamel = (name) => name.replace(/-([a-z])/g, (_match, char) => char.toUpperCase());
 
   return (args = []) => {
     const parsed = {};
