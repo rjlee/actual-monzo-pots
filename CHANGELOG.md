@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.1.0...v1.2.0) (2025-12-30)
+
+
+### Features
+
+* add BASE_PATH configuration and support for reverse proxy ([a0a71ad](https://github.com/rjlee/actual-monzo-pots/commit/a0a71ad732029534860f48820dcff75cf30bb82a))
+
 # [1.1.0](https://github.com/rjlee/actual-monzo-pots/compare/v1.0.2...v1.1.0) (2025-11-11)
 
 
