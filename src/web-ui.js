@@ -15,6 +15,18 @@ const asyncHandler = (fn) => (req, res, next) => Promise.resolve(fn(req, res, ne
 
 const DEFAULT_COOKIE_NAME = 'actual-auth';
 
+function normalizeBasePath(input) {
+  if (!input) return '';
+  let base = input.trim();
+  if (!base) return '';
+  if (!base.startsWith('/')) base = `/${base}`;
+  if (base.length > 1 && base.endsWith('/')) base = base.slice(0, -1);
+  if (base === '/') return '';
+  return base;
+}
+
+const configuredBasePath = normalizeBasePath(process.env.BASE_PATH || config.BASE_PATH);
+
 function hasAuthCookie(req) {
   const cookieName = process.env.AUTH_COOKIE_NAME?.trim() || DEFAULT_COOKIE_NAME;
   const cookieHeader = req.headers?.cookie || '';
@@ -24,12 +36,12 @@ function hasAuthCookie(req) {
     .some((part) => part.startsWith(`${cookieName}=`));
 }
 
-function uiPageHtml({ hadRefreshToken, refreshError, showLogoutButton }) {
+function uiPageHtml({ hadRefreshToken, refreshError, showLogoutButton, basePath }) {
   const templatePath = path.join(__dirname, 'views', 'index.ejs');
   const template = fs.readFileSync(templatePath, 'utf8');
   return ejs.render(
     template,
-    { hadRefreshToken, refreshError, showLogoutButton },
+    { hadRefreshToken, refreshError, showLogoutButton, basePath },
     { filename: templatePath }
   );
 }
@@ -69,11 +81,12 @@ async function createWebApp(verbose = false) {
     });
 
   const app = express();
-  app.use(express.json());
-  app.use(express.static(path.join(__dirname, '..', 'public')));
+  const router = express.Router();
+  router.use(express.json());
+  router.use(express.static(path.join(__dirname, '..', 'public')));
 
-  app.use((req, res, next) => {
-    const meta = { method: req.method, url: req.url };
+  router.use((req, res, next) => {
+    const meta = { method: req.method, url: req.originalUrl || req.url };
     if (verbose) {
       meta.headers = req.headers;
       meta.query = req.query;
@@ -87,21 +100,23 @@ async function createWebApp(verbose = false) {
   const absDataDir = path.isAbsolute(dataDir) ? dataDir : path.join(process.cwd(), dataDir);
   const mappingFile = path.join(absDataDir, 'mapping.json');
 
-  app.get('/auth', (_req, res) => monzo.authorize(res));
-  app.get(
+  router.get('/auth', (_req, res) => monzo.authorize(res));
+  router.get(
     '/auth/callback',
     asyncHandler(async (req, res) => {
       const { code, state } = req.query;
       try {
         await monzo.handleCallback(code, state);
-        return res.redirect('/?auth=success');
+        const mountPath = req.baseUrl || configuredBasePath || '';
+        return res.redirect(`${mountPath}/?auth=success`);
       } catch (err) {
-        return res.redirect('/?auth=error&message=' + encodeURIComponent(err.message));
+        const mountPath = req.baseUrl || configuredBasePath || '';
+        return res.redirect(`${mountPath}/?auth=error&message=` + encodeURIComponent(err.message));
       }
     })
   );
 
-  app.get(
+  router.get(
     '/',
     asyncHandler(async (req, res) => {
       try {
@@ -114,12 +129,13 @@ async function createWebApp(verbose = false) {
           hadRefreshToken,
           refreshError,
           showLogoutButton: hasAuthCookie(req),
+          basePath: configuredBasePath || null,
         })
       );
     })
   );
 
-  app.get(
+  router.get(
     '/api/data',
     asyncHandler(async (_req, res) => {
       if (!monzo.isAuthenticated()) {
@@ -167,16 +183,16 @@ async function createWebApp(verbose = false) {
     })
   );
 
-  app.get('/api/budget-status', (_req, res) => {
+  router.get('/api/budget-status', (_req, res) => {
     res.json({ ready: budgetReady });
   });
 
-  app.post('/api/mappings', (req, res) => {
+  router.post('/api/mappings', (req, res) => {
     fs.writeFileSync(mappingFile, JSON.stringify(req.body, null, 2));
     res.json({ success: true });
   });
 
-  app.post(
+  router.post(
     '/api/sync',
     asyncHandler(async (_req, res) => {
       const count = await runSync({ verbose: false, useLogger: true });
@@ -184,13 +200,15 @@ async function createWebApp(verbose = false) {
     })
   );
 
-  app.use((err, req, res, next) => {
+  router.use((err, req, res, next) => {
     logger.error({ err, method: req.method, url: req.url }, 'Web UI route error');
     if (res.headersSent) {
       return next(err);
     }
     res.status(500).json({ error: err.message });
   });
+
+  app.use(configuredBasePath || '/', router);
 
   return app;
 }

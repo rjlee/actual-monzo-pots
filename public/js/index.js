@@ -1,7 +1,11 @@
 /* eslint-env browser */
 // Global config passed from server-side EJS
-const basePath = window.location.pathname.replace(/\/$/, '');
-const { hadRefreshToken } = window.__UI_CONFIG;
+const uiConfig = window.__UI_CONFIG || {};
+const configuredBasePath =
+  typeof uiConfig.basePath === 'string' && uiConfig.basePath.length > 0 ? uiConfig.basePath : null;
+const derivedBasePath = (configuredBasePath || window.location.pathname).replace(/\/$/, '');
+const basePath = derivedBasePath || '';
+const { hadRefreshToken } = uiConfig;
 
 // Check for auth=success or auth=error in the URL
 (function () {

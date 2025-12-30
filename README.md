@@ -70,6 +70,7 @@ Precedence: CLI flags > environment variables > config file.
 | `SYNC_CRON` / `SYNC_CRON_TIMEZONE` | Daemon cron schedule                           | `45 * * * *` / `UTC`                 |
 | `DISABLE_CRON_SCHEDULING`          | Disable cron while in daemon mode              | `false`                              |
 | `HTTP_PORT`                        | Enables Web UI when set or `--ui` passed       | `3000`                               |
+| `BASE_PATH`                        | Serve UI under a path prefix (e.g. `/monzo`)   | unset (served at `/`)                |
 | `AUTH_COOKIE_NAME`                 | Cookie name forwarded by Traefik for logout UI | `actual-auth`                        |
 | `LOG_LEVEL`                        | Pino log level                                 | `info`                               |
 | `ENABLE_NODE_VERSION_SHIM`         | Legacy shim for older `@actual-app/api` checks | `false`                              |

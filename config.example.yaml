@@ -11,6 +11,9 @@ DISABLE_CRON_SCHEDULING: false
 # Port for web UI server (daemon mode only)
 HTTP_PORT: 3000
 
+# Optional path prefix when running behind a reverse proxy (e.g. '/monzo')
+BASE_PATH: ''
+
 # Base directory for data storage (mapping file)
 DATA_DIR: './data'
 

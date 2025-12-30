@@ -7,7 +7,7 @@
     <span id="budgetStatus" class="badge bg-info">Budget downloading</span>
   </div>
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <a id="authBtn" href="/auth" class="btn btn-secondary">Authenticate Monzo</a>
+    <a id="authBtn" href="auth" class="btn btn-secondary">Authenticate Monzo</a>
     <% if (showLogoutButton) { %>
       <form method="post" action="/auth/logout" class="m-0">
         <button type="submit" class="btn btn-warning">Logout</button>
@@ -46,8 +46,11 @@
     </div>
   </div>
   <script>
-    // Pass server data into front-end
-    window.__UI_CONFIG = { hadRefreshToken: <%= hadRefreshToken %> };
+    // Pass server data into front-end (basePath enables operation behind reverse proxies)
+    window.__UI_CONFIG = {
+      hadRefreshToken: <%= hadRefreshToken %>,
+      basePath: <%- basePath ? JSON.stringify(basePath) : 'null' %>
+    };
   </script>
   <script src="./js/index.js"></script>
 <%- include('footer') %>
