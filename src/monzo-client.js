@@ -20,6 +20,7 @@ class MonzoClient {
     this.state = null;
     this.accessToken = null;
     this.refreshToken = null;
+    this.redirectUriResolved = null;
   }
 
   async init() {
@@ -39,7 +40,29 @@ class MonzoClient {
     }
   }
 
-  authorize(res) {
+  resolveRedirectUri(req, basePath) {
+    const raw = this.redirectUri;
+    if (!raw) return null;
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+      return raw;
+    }
+    const forwardedProto = (req?.headers?.['x-forwarded-proto'] || '').split(',')[0].trim();
+    const proto = forwardedProto || req?.protocol || 'http';
+    const forwardedHost = (req?.headers?.['x-forwarded-host'] || '').split(',')[0].trim();
+    const host = forwardedHost || req?.headers?.host;
+    if (!host) return null;
+
+    let path = raw.startsWith('/') ? raw : `/${raw}`;
+    if (basePath) {
+      const prefix = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
+      if (!path.startsWith(prefix + '/') && path !== prefix) {
+        path = `${prefix}${path}`;
+      }
+    }
+    return `${proto}://${host}${path}`;
+  }
+
+  authorize(req, res, options = {}) {
     // Validate required settings early with clear errors
     if (!this.clientId || !this.redirectUri) {
       const missing = [];
@@ -49,10 +72,18 @@ class MonzoClient {
       logger.error(msg);
       return res.status(500).send(msg);
     }
+    const resolvedRedirectUri = this.resolveRedirectUri(req, options.basePath);
+    if (!resolvedRedirectUri) {
+      const msg =
+        'Unable to resolve REDIRECT_URI. Provide an absolute URL or ensure the request includes host headers.';
+      logger.error(msg);
+      return res.status(500).send(msg);
+    }
+    this.redirectUriResolved = resolvedRedirectUri;
     this.state = randomUUID();
     const params = new URLSearchParams({
       client_id: this.clientId,
-      redirect_uri: this.redirectUri,
+      redirect_uri: resolvedRedirectUri,
       response_type: 'code',
       state: this.state,
     });
@@ -73,7 +104,7 @@ class MonzoClient {
       grant_type: 'authorization_code',
       client_id: this.clientId,
       client_secret: this.clientSecret,
-      redirect_uri: this.redirectUri,
+      redirect_uri: this.redirectUriResolved || this.redirectUri,
       code,
     }).toString();
     logger.debug({ params }, 'Exchanging code for tokens');

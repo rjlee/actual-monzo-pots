@@ -100,7 +100,7 @@ async function createWebApp(verbose = false) {
   const absDataDir = path.isAbsolute(dataDir) ? dataDir : path.join(process.cwd(), dataDir);
   const mappingFile = path.join(absDataDir, 'mapping.json');
 
-  router.get('/auth', (_req, res) => monzo.authorize(res));
+  router.get('/auth', (req, res) => monzo.authorize(req, res, { basePath: configuredBasePath }));
   router.get(
     '/auth/callback',
     asyncHandler(async (req, res) => {

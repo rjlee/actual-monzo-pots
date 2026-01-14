@@ -60,7 +60,8 @@ describe('init()', () => {
 describe('authorize()', () => {
   it('sets state and redirects to Monzo auth endpoint', () => {
     const res = { redirect: jest.fn() };
-    monzo.authorize(res);
+    const req = { headers: { host: 'example.test' }, protocol: 'http' };
+    monzo.authorize(req, res);
     expect(monzo.state).toBe('fixed-state');
     const expectedParams = new URLSearchParams({
       client_id: 'client-id',
@@ -69,6 +70,25 @@ describe('authorize()', () => {
       state: 'fixed-state',
     }).toString();
     expect(res.redirect).toHaveBeenCalledWith(`https://auth.endpoint/oauth?${expectedParams}`);
+  });
+
+  it('resolves relative redirect URIs using request headers and base path', () => {
+    const res = { redirect: jest.fn() };
+    const req = {
+      headers: { host: 'actual.home', 'x-forwarded-proto': 'https' },
+      protocol: 'http',
+    };
+    const originalRedirect = monzo.redirectUri;
+    monzo.redirectUri = '/auth/callback';
+    monzo.authorize(req, res, { basePath: '/monzo' });
+    const expectedParams = new URLSearchParams({
+      client_id: 'client-id',
+      redirect_uri: 'https://actual.home/monzo/auth/callback',
+      response_type: 'code',
+      state: 'fixed-state',
+    }).toString();
+    expect(res.redirect).toHaveBeenCalledWith(`https://auth.endpoint/oauth?${expectedParams}`);
+    monzo.redirectUri = originalRedirect;
   });
 });
 

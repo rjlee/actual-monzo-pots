@@ -62,7 +62,7 @@ Precedence: CLI flags > environment variables > config file.
 | Setting                            | Description                                    | Default                              |
 | ---------------------------------- | ---------------------------------------------- | ------------------------------------ |
 | `CLIENT_ID` / `CLIENT_SECRET`      | Monzo OAuth credentials                        | required                             |
-| `REDIRECT_URI`                     | OAuth redirect URI                             | required                             |
+| `REDIRECT_URI`                     | OAuth redirect URI (absolute URL or relative)  | required                             |
 | `MONZO_SCOPES`                     | Space-separated scopes                         | from developer portal                |
 | `DATA_DIR`                         | Local storage for tokens + mappings            | `./data`                             |
 | `TOKEN_DIRECTORY` / `TOKEN_FILE`   | Refresh token location                         | `./data` / `monzo_refresh_token.txt` |
