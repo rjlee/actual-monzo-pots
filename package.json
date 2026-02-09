@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@actual-app/api": "^26.2.0",
-    "axios": "^1.13.4",
+    "axios": "^1.13.5",
     "dotenv": "^17.2.4",
     "ejs": "^4.0.1",
     "ejs-lint": "^2.0.1",
