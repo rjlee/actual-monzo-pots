@@ -22,7 +22,7 @@
     "node": ">=22"
   },
   "dependencies": {
-    "@actual-app/api": "^26.4.0",
+    "@actual-app/api": "^26.5.0",
     "axios": "^1.15.2",
     "dotenv": "^17.4.2",
     "ejs": "^5.0.2",
