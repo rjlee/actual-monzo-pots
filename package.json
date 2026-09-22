@@ -24,7 +24,7 @@
   "dependencies": {
     "@actual-app/api": "^26.9.0",
     "axios": "^1.20.0",
-    "dotenv": "^18.0.0",
+    "dotenv": "^18.0.1",
     "ejs": "^6.0.1",
     "ejs-lint": "^2.0.1",
     "express": "^5.2.1",
