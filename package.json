@@ -30,7 +30,7 @@
     "express": "^5.2.1",
     "js-yaml": "^5.4.2",
     "node-cron": "^4.6.0",
-    "pino": "^10.3.1",
+    "pino": "^10.4.0",
     "yargs": "^18.2.0"
   },
   "devDependencies": {
